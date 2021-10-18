@@ -3,7 +3,7 @@
 namespace Jiajushe\HyperfHelper;
 
 
-use Jiajushe\HyperfHelper\Exception\Custom;
+use Jiajushe\HyperfHelper\Exception\CustomError;
 
 class Hash
 {
@@ -13,13 +13,13 @@ class Hash
      * @param string $algo
      * @param array|int[] $option
      * @return false|string|null
-     * @throws Custom
+     * @throws CustomError
      * @author yun 2021-10-12 10:18:35
      */
     public function make(string $password, string $algo = PASSWORD_DEFAULT, array $option = ['cost' => 10])
     {
         if (!$hash = password_hash($password, $algo,$option)) {
-            throw new Custom('make hash error', 5);
+            throw new CustomError('make hash error', 5);
         }
         return $hash;
     }

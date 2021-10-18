@@ -5,7 +5,7 @@ namespace Jiajushe\HyperfHelper\Exception;
 use Exception;
 use Throwable;
 
-class Custom extends Exception
+class CustomError extends Exception
 {
     /**
      * @param string $message

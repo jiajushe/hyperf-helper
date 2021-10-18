@@ -1,9 +1,10 @@
 {
     "name": "jiajushe/hyperf-helper",
-    "description": "hyperf-helper",
+    "description": "hyperf helper",
     "type": "library",
     "require": {
         "php": ">=7.4",
+        "ext-mongodb": "1.10.*",
         "mongodb/mongodb": ">=1.9",
         "hyperf/config": ">=2.2",
         "hyperf/utils": ">=2.2",
@@ -29,5 +30,13 @@
             "email": "smart.yuan@hotmail.com"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "hyperf": {
+            "config": "Jiajushe\\HyperfHelper\\ConfigProvider"
+        }
+    }
 }
