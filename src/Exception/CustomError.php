@@ -5,6 +5,10 @@ namespace Jiajushe\HyperfHelper\Exception;
 use Exception;
 use Throwable;
 
+/**
+ * 系统异常类
+ * @author yun 2021-10-18 23:42:54
+ */
 class CustomError extends Exception
 {
     /**

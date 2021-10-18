@@ -5,6 +5,10 @@ namespace Jiajushe\HyperfHelper\Exception;
 use Exception;
 use Throwable;
 
+/**
+ * 提示性异常类
+ * @author yun 2021-10-18 23:42:24
+ */
 class CustomAlert extends Exception
 {
     /**

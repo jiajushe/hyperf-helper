@@ -8,6 +8,10 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\Container\ContainerInterface;
 
+/**
+ * 自定义控制器抽象类
+ * @author yun 2021-10-18 23:40:26
+ */
 abstract class BaseController
 {
     /**

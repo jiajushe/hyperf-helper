@@ -9,6 +9,10 @@ use Jiajushe\HyperfHelper\Response;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
+/**
+ * MongoDB异常处理类，记录错误日志
+ * @author yun 2021-10-18 23:45:28
+ */
 class MongoDB  extends ExceptionHandler
 {
 

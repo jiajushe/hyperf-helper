@@ -2,15 +2,16 @@
 
 namespace Jiajushe\HyperfHelper\ExceptionHandler;
 
-//use Hyperf\Contract\ConfigInterface;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
-
-//use Hyperf\Utils\ApplicationContext;
 use Jiajushe\HyperfHelper\Response;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
+/**
+ * 全局异常处理类
+ * @author yun 2021-10-18 23:44:38
+ */
 class Custom extends ExceptionHandler
 {
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface

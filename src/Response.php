@@ -5,6 +5,10 @@ namespace Jiajushe\HyperfHelper;
 use Hyperf\Utils\Codec\Json;
 use Throwable;
 
+/**
+ * api返回信息处理类
+ * @author yun 2021-10-18 23:46:30
+ */
 class Response
 {
     /**
