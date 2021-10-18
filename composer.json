@@ -8,8 +8,8 @@
         "hyperf/config": ">=2.2",
         "hyperf/utils": ">=2.2",
         "hyperf/exception-handler": ">=2.2",
-        "hyperf/http-message": "2.2.x-dev",
-        "hyperf/contract": "2.2.x-dev"
+        "hyperf/http-message": ">=2.2",
+        "hyperf/contract": ">=2.2"
     },
     "require-dev": {
         "hyperf/ide-helper": ">=2.2",
