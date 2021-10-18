@@ -28,6 +28,3 @@ class MongoDB  extends ExceptionHandler
         return Str::contains(get_class($throwable), 'MongoDB\Driver\Exception');
     }
 }
-{
-
-}

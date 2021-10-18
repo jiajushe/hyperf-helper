@@ -15,12 +15,15 @@ class Custom extends ExceptionHandler
 {
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-//        $container = ApplicationContext::getContainer();
-//        $config = $container->get(ConfigInterface::class);
         $res = (new Response())->isDevRes($throwable);
+        if (method_exists($throwable, 'getHttpCode')) {
+            $http_code = $throwable->getHttpCode();
+        } else {
+            $http_code = config('res_code.http.system_error');
+        }
         $this->stopPropagation();
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
-            ->withStatus(config('res_code.http.system_error'))
+            ->withStatus($http_code)
             ->withAddedHeader('content-type', 'application/json; charset=utf-8')
             ->withBody(new SwooleStream($res));
     }

@@ -5,7 +5,7 @@ namespace Jiajushe\HyperfHelper\Exception;
 use Exception;
 use Throwable;
 
-class CustomError extends Exception
+class CustomAlert extends Exception
 {
     /**
      * @param string $message
@@ -16,13 +16,13 @@ class CustomError extends Exception
     public function __construct($message = "", int $code = null, Throwable $previous = null)
     {
         if ($code === null) {
-            $code = config('res_code.error');
+            $code = config('res_code.alert');
         }
         parent::__construct($message, $code, $previous);
     }
 
     public function getHttpCode()
     {
-        return config('res_code.http.system_error');
+        return config('res_code.http.normal');
     }
 }
