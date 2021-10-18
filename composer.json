@@ -5,12 +5,14 @@
     "require": {
         "php": ">=7.4",
         "ext-mongodb": "1.10.*",
-        "mongodb/mongodb": ">=1.9",
-        "hyperf/config": ">=2.2",
-        "hyperf/utils": ">=2.2",
-        "hyperf/exception-handler": ">=2.2",
-        "hyperf/http-message": ">=2.2",
-        "hyperf/contract": ">=2.2"
+        "hyperf/config": "~2.2.0",
+        "hyperf/contract": "~2.2.0",
+        "hyperf/di": "2.2.x-dev",
+        "hyperf/exception-handler": "~2.2.0",
+        "hyperf/http-message": "~2.2.0",
+        "hyperf/http-server": "~2.2.0",
+        "hyperf/utils": "~2.2.0",
+        "mongodb/mongodb": ">=1.9"
     },
     "require-dev": {
         "hyperf/ide-helper": ">=2.2",
