@@ -1,0 +1,33 @@
+{
+    "name": "jiajushe/hyperf-helper",
+    "description": "hyperf-helper",
+    "type": "library",
+    "require": {
+        "php": ">=7.4",
+        "mongodb/mongodb": ">=1.9",
+        "hyperf/config": ">=2.2",
+        "hyperf/utils": ">=2.2",
+        "hyperf/exception-handler": ">=2.2",
+        "hyperf/http-message": "2.2.x-dev",
+        "hyperf/contract": "2.2.x-dev"
+    },
+    "require-dev": {
+        "hyperf/ide-helper": ">=2.2",
+        "swoole/ide-helper": ">=4.5",
+        "phpstan/phpstan": ">=0.12",
+        "hyperf/devtool": ">=2.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Jiajushe\\HyperfHelper\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "SmartYuan",
+            "email": "smart.yuan@hotmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
