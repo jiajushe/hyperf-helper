@@ -207,7 +207,7 @@ class Model
      * @param ...$param
      * @return mixed
      */
-    final protected function execute(...$param)
+    final public function execute(...$param)
     {
         $method = array_shift($param);
         return $this->collectionObj->$method(...$param)->toArray();
