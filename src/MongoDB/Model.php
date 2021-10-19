@@ -56,4 +56,9 @@ abstract class Model
     {
         return $this->modelTask->insert($this->config, $document, $timeout);
     }
+
+    public function insertNoTask(array $document, int $timeout = 1000): array
+    {
+        return $this->modelTask->insertNoTask($this->config, $document, $timeout);
+    }
 }
