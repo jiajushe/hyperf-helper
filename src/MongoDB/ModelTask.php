@@ -55,8 +55,9 @@ class ModelTask
      * @param array $options
      * @return array
      */
-    public function write(Manager $manager, string $namespace, BulkWrite $bulkWrite, array $options): array
+    public function write(string $uri, string $namespace, BulkWrite $bulkWrite, array $options): array
     {
+        $manager = new Manager($uri);
         $res = $manager->executeBulkWrite($namespace, $bulkWrite, $options);
         return [
             'inserted_count' => $res->getInsertedCount(),

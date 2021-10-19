@@ -16,6 +16,7 @@ use MongoDB\Driver\WriteConcern;
 abstract class Model
 {
     protected Manager $manager;
+    protected string $uri;
     protected Session $session;
     protected string $connection;
     protected array $config;
@@ -47,6 +48,7 @@ abstract class Model
             } else {
                 $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
             }
+            $this->uri = $uri;
             $this->manager = new Manager($uri);
         }
         return $this->manager;
@@ -153,7 +155,7 @@ abstract class Model
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->insert($document);
         return $this->modelTask->write(
-            $this->getManager(),
+            $this->uri,
             $this->getNamespace(),
             $bulkWrite,
             ['writeConcern' => $this->writeConcern()]);
