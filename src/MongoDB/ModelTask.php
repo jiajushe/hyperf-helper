@@ -49,7 +49,7 @@ class ModelTask
 
     /**
      * @Task(timeout=10)
-     * @param Manager $manager
+     * @param string $uri
      * @param string $namespace
      * @param BulkWrite $bulkWrite
      * @param array $options
@@ -57,8 +57,11 @@ class ModelTask
      */
     public function write(string $uri, string $namespace, BulkWrite $bulkWrite, array $options): array
     {
+        pp(1);
         $manager = new Manager($uri);
+        pp(2);
         $res = $manager->executeBulkWrite($namespace, $bulkWrite, $options);
+        pp(3);
         return [
             'inserted_count' => $res->getInsertedCount(),
             'upserted_count' => $res->getUpsertedCount(),
