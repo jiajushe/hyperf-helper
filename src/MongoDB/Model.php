@@ -145,9 +145,9 @@ class Model
      * 选择字段
      * @param array $field_arr
      * @param int $opt
-     * @return ModelTask
+     * @return Model
      */
-    public function select(array $field_arr, int $opt = 1): ModelTask
+    public function select(array $field_arr, int $opt = 1): Model
     {
         foreach ($field_arr as $field) {
             $this->projection[$field] = $opt;
@@ -159,10 +159,10 @@ class Model
      * @param $field
      * @param null $operator
      * @param null $value
-     * @return ModelTask
+     * @return Model
      * @author yun 2021-10-15 17:03:36
      */
-    public function where($field, $operator = null, $value = null): ModelTask
+    public function where($field, $operator = null, $value = null): Model
     {
         if (is_array($field)) {
             foreach ($field as $key => $val) {
@@ -203,10 +203,15 @@ class Model
         );
     }
 
+    /**
+     * @Task
+     * @param ...$param
+     * @return mixed
+     */
     final protected function execute(...$param)
     {
         $method = array_shift($param);
-        return $this->collectionObj->$method(...$param);
+        return $this->collectionObj->$method(...$param)->toArray();
 //        $parallel = new Parallel($this->config['concurrent']);
 //        $parallel->add(function () use ($param) {
 //            return $this->collectionObj->$method(...$param);

@@ -112,7 +112,7 @@ abstract class ModelTask
     }
 
     /**
-     * @Task(timeout=30)
+     * @Task
      * @param array $document
      * @return WriteResult
      */
