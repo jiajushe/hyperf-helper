@@ -103,7 +103,6 @@ class Model
         }
         $this->clientObj = new Client($uri);
         $this->collectionObj = $this->clientObj->selectCollection($this->config['database'], $this->table_name);
-        $this->collectionObj->createIndexes();
     }
 
     /**
