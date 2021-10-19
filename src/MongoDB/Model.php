@@ -3,8 +3,8 @@
 namespace Jiajushe\HyperfHelper\MongoDB;
 
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Task\Annotation\Task;
 use Hyperf\Utils\ApplicationContext;
-use Hyperf\Utils\Parallel;
 use Hyperf\Utils\Str;
 use MongoDB\Client;
 use MongoDB\Collection;
@@ -87,7 +87,7 @@ abstract class Model
     }
 
     /**
-     * 设置mongodb client对象
+     * 设置mongodb collection 对象
      * @author yun 2021-10-11 10:42:47
      */
     final protected function setCollectionObj()
@@ -106,7 +106,7 @@ abstract class Model
     }
 
     /**
-     * 设置collection name
+     * 设置表名
      * @author yun 2021-10-14 14:12:23
      */
     final protected function setTableName()
@@ -179,10 +179,19 @@ abstract class Model
         return $this;
     }
 
+    /**
+     * 查询一条
+     * @param null $pk_value
+     * @return mixed
+     */
     public function findOne($pk_value = null)
     {
         if ($pk_value !== null && $this->pk !== '') {
-            return $this->execute(__FUNCTION__, [$this->pk => $pk_value]);
+            return $this->execute(
+                __FUNCTION__,
+                [$this->pk => $pk_value],
+                ['projection' => $this->projection,]
+            );
         }
         return $this->execute(
             __FUNCTION__,
@@ -194,18 +203,20 @@ abstract class Model
     }
 
     /**
-     * 执行制作
+     * 执行操作
+     * @Task()
      * @param ...$param
      * @return mixed
      * @author yun 2021-10-15 11:57:05
      */
     final protected function execute(...$param)
     {
-        $parallel = new Parallel($this->config['concurrent']);
-        $parallel->add(function () use ($param) {
-            $method = array_shift($param);
-            return $this->collectionObj->$method(...$param);
-        });
-        return $parallel->wait()[0];
+        $method = array_shift($param);
+        return $this->collectionObj->$method(...$param);
+//        $parallel = new Parallel($this->config['concurrent']);
+//        $parallel->add(function () use ($param) {
+//            return $this->collectionObj->$method(...$param);
+//        });
+//        return $parallel->wait()[0];
     }
 }
