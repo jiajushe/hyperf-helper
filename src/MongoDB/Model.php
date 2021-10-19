@@ -103,6 +103,7 @@ class Model
         }
         $this->clientObj = new Client($uri);
         $this->collectionObj = $this->clientObj->selectCollection($this->config['database'], $this->table_name);
+        $this->collectionObj->createIndexes();
     }
 
     /**
@@ -144,9 +145,9 @@ class Model
      * 选择字段
      * @param array $field_arr
      * @param int $opt
-     * @return Model
+     * @return ModelTask
      */
-    public function select(array $field_arr, int $opt = 1): Model
+    public function select(array $field_arr, int $opt = 1): ModelTask
     {
         foreach ($field_arr as $field) {
             $this->projection[$field] = $opt;
@@ -158,10 +159,10 @@ class Model
      * @param $field
      * @param null $operator
      * @param null $value
-     * @return Model
+     * @return ModelTask
      * @author yun 2021-10-15 17:03:36
      */
-    public function where($field, $operator = null, $value = null): Model
+    public function where($field, $operator = null, $value = null): ModelTask
     {
         if (is_array($field)) {
             foreach ($field as $key => $val) {

@@ -11,6 +11,7 @@
         "hyperf/exception-handler": "~2.2.0",
         "hyperf/http-message": "~2.2.0",
         "hyperf/http-server": "~2.2.0",
+        "hyperf/task": "~2.2.0",
         "hyperf/utils": "~2.2.0",
         "mongodb/mongodb": ">=1.9"
     },
