@@ -9,7 +9,7 @@ use Hyperf\Utils\Str;
 use MongoDB\Client;
 use MongoDB\Collection;
 
-abstract class Model
+class Model
 {
     /**
      * @var Client
@@ -202,6 +202,11 @@ abstract class Model
         );
     }
 
+    /**
+     * @Task
+     * @param ...$param
+     * @return mixed
+     */
     final protected function execute(...$param)
     {
         $method = array_shift($param);
