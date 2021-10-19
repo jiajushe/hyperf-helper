@@ -150,7 +150,8 @@ abstract class Model
      */
     public function create(array $document): array
     {
-        $bulkWrite = $this->bulkWrite()->insert($document);
+        $bulkWrite = $this->bulkWrite();
+        $bulkWrite->insert($document);
         return $this->modelTask->write(
             $this->getManager(),
             $this->getNamespace(),
