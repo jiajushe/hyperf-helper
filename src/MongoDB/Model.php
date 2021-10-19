@@ -210,7 +210,7 @@ class Model
     final public function execute(...$param)
     {
         $method = array_shift($param);
-        return $this->collectionObj->$method(...$param)->toArray();
+        return $this->collectionObj->$method(...$param);
 //        $parallel = new Parallel($this->config['concurrent']);
 //        $parallel->add(function () use ($param) {
 //            return $this->collectionObj->$method(...$param);
