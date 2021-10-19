@@ -70,4 +70,30 @@ class ModelTask
             'is_acknowledged' => $res->isAcknowledged(),
         ];
     }
+
+    /**
+     * @param array $config
+     * @param array $document
+     * @param int $timeout
+     * @return array
+     */
+    public function insertNoTask(array $config,array $document, int $timeout = 1000): array
+    {
+        $bulkWrite = $this->bulkWrite();
+        foreach ($document as $row) {
+            $bulkWrite->insert($row);
+        }
+        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        return [
+            'inserted_count' => $res->getInsertedCount(),
+            'upserted_count' => $res->getUpsertedCount(),
+            'upserted_ids' => $res->getUpsertedIds(),
+            'matched_count' => $res->getMatchedCount(),
+            'modified_count' => $res->getModifiedCount(),
+            'deleted_count' => $res->getDeletedCount(),
+            'write_concern_error' => $res->getWriteConcernError(),
+            'write_errors' => $res->getWriteErrors(),
+            'is_acknowledged' => $res->isAcknowledged(),
+        ];
+    }
 }
