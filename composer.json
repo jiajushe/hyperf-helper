@@ -7,7 +7,7 @@
         "ext-mongodb": "1.10.*",
         "hyperf/config": "~2.2.0",
         "hyperf/contract": "~2.2.0",
-        "hyperf/di": "2.2.x-dev",
+        "hyperf/di": "~2.2.0",
         "hyperf/exception-handler": "~2.2.0",
         "hyperf/http-message": "~2.2.0",
         "hyperf/http-server": "~2.2.0",
