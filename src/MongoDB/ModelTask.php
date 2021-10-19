@@ -24,7 +24,7 @@ class ModelTask
             $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
         }
         $this->namespace = $config['database'] . '.' . $config['collection'];
-        return $this->manager = new Manager($uri);
+        return new Manager($uri);
     }
 
     /**
