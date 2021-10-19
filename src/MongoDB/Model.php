@@ -2,219 +2,107 @@
 
 namespace Jiajushe\HyperfHelper\MongoDB;
 
+
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Task\Annotation\Task;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Str;
-use MongoDB\Client;
-use MongoDB\Collection;
+use MongoDB\Driver\Manager;
 
 abstract class Model
 {
-    /**
-     * @var Client
-     */
-    protected Client $clientObj;
-
-    /**
-     * @var Collection  表的对象
-     */
-    protected Collection $collectionObj;
-
-    /**
-     * @var string  mongodb连接配置名称
-     */
+    protected Manager $manager;
+    private $session;
     protected string $connection;
-
-    /**
-     * @var array   mongodb连接配置
-     */
     protected array $config;
-
-    /**
-     * @var string  表名称
-     */
-    protected string $table_name;
-
-    /**
-     * @var string  主键
-     */
-    protected string $pk = '';
-
-    /**
-     * @var array|int[] 要选择的字段
-     */
-    protected array $projection = ['_id' => 0];
-
-    /**
-     * @var array   查询条件
-     */
-    protected array $filter = [];
-
-    protected array $operatorsArr = [
-        '!=' => '$ne',
-        '>' => '$gt',
-        '>=' => '$gte',
-        '<' => '$lt',
-        '<=' => '$lte',
-        'in' => '$in',
-        'not' => '$not',
-        'not_in' => '$nin',
-        'not in' => '$nin',
-    ];
+    protected string $database;
+    protected string $collection;
+    protected string $namespace;
 
     public function __construct()
     {
-        $this->setConfig();
-        $this->setTableName();
-        $this->setCollectionObj();
+        $this->getManager();
     }
 
     /**
-     * 设置mongodb连接参数
-     * @author yun 2021-10-11 13:53:18
+     * @return Manager
+     * @author yun 2021-10-19 11:28:21
      */
-    final protected function setConfig(): void
+    final protected function getManager(): Manager
+    {
+        $config = $this->getConfig();
+        if (!isset($this->manager)) {
+            if (!$config['username']) {
+                $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
+            } else {
+                $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
+            }
+            $this->manager = new Manager($uri);
+        }
+        return $this->manager;
+    }
+
+    /**
+     * @return array
+     */
+    final protected function getConfig(): array
     {
         if (isset($this->config)) {
-            return;
+            return $this->config;
         }
         if (!isset($this->connection)) {
             $this->connection = 'default';
         }
         $configObj = ApplicationContext::getContainer()->get(ConfigInterface::class);
         $this->config = $configObj->get('mongodb.' . $this->connection);
+        return $this->config;
     }
 
     /**
-     * 设置mongodb collection 对象
-     * @author yun 2021-10-11 10:42:47
+     * @return string
      */
-    final protected function setCollectionObj()
+    public function getDatabase(): string
     {
-        if (!isset($this->config)) {
-            $this->setConfig();
+        if (!isset($this->database)) {
+            $config = $this->getConfig();
+            $this->database = $config['database'];
         }
-        $config = $this->config;
-        if (!$config['username']) {
-            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
-        } else {
-            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
-        }
-        $this->clientObj = new Client($uri);
-        $this->collectionObj = $this->clientObj->selectCollection($this->config['database'], $this->table_name);
+        return $this->database;
     }
 
     /**
-     * 设置表名
-     * @author yun 2021-10-14 14:12:23
+     * @return string
      */
-    final protected function setTableName()
+    public function getCollection(): string
     {
-        if (!isset($this->table_name)) {
-            $this->table_name = Str::snake(Str::afterLast(get_class($this), '\\'));
+        if (!isset($this->collection)) {
+            $this->collection = Str::snake(Str::afterLast(get_class($this), '\\'));
         }
+        return $this->collection;
     }
 
     /**
-     * 插入一条数据
-     * @param array $data
-     * @param array $options
-     * @return mixed
-     * @author yun 2021-10-15 11:57:49
+     * @return string
      */
-    public function insertOne(array $data, array $options = [])
+    public function getNamespace(): string
     {
-        return $this->execute(__FUNCTION__, $data, $options);
+        if (!isset($this->namespace)) {
+            $this->namespace = $this->getDatabase() . '.' . $this->getCollection();
+        }
+        return $this->namespace;
     }
 
-    /**
-     * 插入多条数据
-     * @param array $data
-     * @param array $options
-     * @return mixed
-     * @author yun 2021-10-15 11:57:40
-     */
-    public function insertMany(array $data, array $options = [])
+    final private function setSession()
     {
-        return $this->execute(__FUNCTION__, $data, $options);
+        $this->session = $this->manager->startSession(['causalConsistency' => true]);
     }
 
-    /**
-     * 选择字段
-     * @param array $field_arr
-     * @param int $opt
-     * @return Model
-     */
-    public function select(array $field_arr, int $opt = 1): Model
+    final public function startTransaction()
     {
-        foreach ($field_arr as $field) {
-            $this->projection[$field] = $opt;
+        if (!isset($this->session)) {
+            $this->setSession();
         }
-        return $this;
+        return $this->session;
     }
 
-    /**
-     * @param $field
-     * @param null $operator
-     * @param null $value
-     * @return Model
-     * @author yun 2021-10-15 17:03:36
-     */
-    public function where($field, $operator = null, $value = null): Model
-    {
-        if (is_array($field)) {
-            foreach ($field as $key => $val) {
-                $this->filter[$key] = $val;
-            }
-            return $this;
-        }
-        if ($operator !== null && $value === null) {
-            $this->filter[$field] = $operator;
-            return $this;
-        }
-        if ($operator !== null && $value !== null) {
-            $this->filter[$field] = [$this->operatorsArr[$operator] => $value];
-        }
-        return $this;
-    }
 
-    /**
-     * 查询一条
-     * @param null $pk_value
-     * @return mixed
-     */
-    public function findOne($pk_value = null)
-    {
-        if ($pk_value !== null && $this->pk !== '') {
-            return $this->execute(
-                __FUNCTION__,
-                [$this->pk => $pk_value],
-                ['projection' => $this->projection,]
-            );
-        }
-        return $this->execute(
-            __FUNCTION__,
-            $this->filter,
-            [
-                'projection' => $this->projection,
-            ]
-        );
-    }
-
-    /**
-     * @Task
-     * @param ...$param
-     * @return mixed
-     */
-    final public function execute(...$param)
-    {
-        $method = array_shift($param);
-        return serialize($this->collectionObj->$method(...$param));
-//        $parallel = new Parallel($this->config['concurrent']);
-//        $parallel->add(function () use ($param) {
-//            return $this->collectionObj->$method(...$param);
-//        });
-//        return $parallel->wait()[0];
-    }
 }
