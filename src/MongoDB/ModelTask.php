@@ -46,6 +46,7 @@ class ModelTask
 
     /**
      * @Task(timeout=30)
+     * @param array $config
      * @param array $document
      * @param int $timeout
      * @return array
