@@ -118,10 +118,15 @@ abstract class ModelTask
      */
     public function insert(array $document): WriteResult
     {
+        pp(1);
         $bulk = $this->bulk();
+        pp(2);
         foreach ($document as $row) {
+            pp(3);
             $bulk->insert($row);
+            pp(4);
         }
+        pp(5);
         return $this->manager->executeBulkWrite($this->getNamespace(), $bulk, $this->writeConcern(3000));
     }
 
