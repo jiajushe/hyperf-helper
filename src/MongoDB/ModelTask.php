@@ -3,65 +3,57 @@
 namespace Jiajushe\HyperfHelper\MongoDB;
 
 use Hyperf\Task\Annotation\Task;
-use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Manager;
+use MongoDB\Driver\BulkWrite;
+use MongoDB\Driver\WriteConcern;
 
-//use MongoDB\Driver\WriteResult;
 
 class ModelTask
 {
-//    /**
-//     * @var Manager
-//     */
-//    public $manager;
-//
-//    /**
-//     * @Task
-//     */
-//    public function insert(string $namespace, array $document)
-//    {
-//        $writeConcern = new WriteConcern(WriteConcern::MAJORITY, 1000);
-//        $bulk = new BulkWrite();
-//        $bulk->insert($document);
-//
-//        $result = $this->manager()->executeBulkWrite($namespace, $bulk, $writeConcern);
-//        return $result->getUpsertedCount();
-//    }
-//
-//    /**
-//     * @Task
-//     */
-//    public function query(string $namespace, array $filter = [], array $options = [])
-//    {
-//        $query = new Query($filter, $options);
-//        $cursor = $this->manager()->executeQuery($namespace, $query);
-//        return $cursor->toArray();
-//    }
-//
-//    protected function manager()
-//    {
-//        if ($this->manager instanceof Manager) {
-//            return $this->manager;
-//        }
-//        $uri = 'mongodb://127.0.0.1:27017';
-//        return $this->manager = new Manager($uri, []);
-//    }
+    protected Manager $manager;
+    protected string $namespace;
+
+    public function __construct(array $config)
+    {
+        if (!$config['username']) {
+            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
+        } else {
+            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
+        }
+        $this->namespace = $config['database'] . '.' . $config['collection'];
+        $this->manager = new Manager($uri);
+    }
 
     /**
-     * @Task(timeout=10)
-     * @param string $uri
-     * @param string $namespace
-     * @param BulkWrite $bulkWrite
-     * @param array $options
+     * @return BulkWrite
+     */
+    final protected function bulkWrite(): BulkWrite
+    {
+        return new BulkWrite();
+    }
+
+    /**
+     * @param int $timeout
+     * @return WriteConcern
+     */
+    final protected function writeConcern(int $timeout = 1000): WriteConcern
+    {
+        return new WriteConcern(WriteConcern::MAJORITY, $timeout);
+    }
+
+    /**
+     * @Task(timeout=30)
+     * @param array $document
+     * @param int $timeout
      * @return array
      */
-    public function write(string $uri, string $namespace, BulkWrite $bulkWrite, array $options): array
+    public function insert(array $document, int $timeout = 1000): array
     {
-        pp(1);
-        $manager = new Manager($uri);
-        pp(2);
-        $res = $manager->executeBulkWrite($namespace, $bulkWrite, $options);
-        pp(3);
+        $bulkWrite = $this->bulkWrite();
+        foreach ($document as $row) {
+            $bulkWrite->insert($row);
+        }
+        $res = $this->manager->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'inserted_count' => $res->getInsertedCount(),
             'upserted_count' => $res->getUpsertedCount(),
@@ -73,5 +65,4 @@ class ModelTask
             'write_concern_error' => $res->getWriteConcernError()
         ];
     }
-
 }

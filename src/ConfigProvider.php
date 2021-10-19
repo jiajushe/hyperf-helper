@@ -27,9 +27,16 @@ class ConfigProvider
 //                公用函数文件
                 [
                     'id' => 'helper_function',
-                    'description' => 'The config of helper_function.',
+                    'description' => 'The function of common.',
                     'source' => __DIR__ . '/../publish/helper_function.php',
                     'destination' => BASE_PATH . '/config/autoload/helper_function.php',
+                ],
+//                mongodb配置文件
+                [
+                    'id' => 'mongodb',
+                    'description' => 'The config of mongodb.',
+                    'source' => __DIR__ . '/../publish/mongodb.php',
+                    'destination' => BASE_PATH . '/config/autoload/mongodb.php',
                 ],
             ],
         ];
