@@ -202,11 +202,6 @@ class Model
         );
     }
 
-    /**
-     * @Task
-     * @param ...$param
-     * @return mixed
-     */
     final protected function execute(...$param)
     {
         $method = array_shift($param);
