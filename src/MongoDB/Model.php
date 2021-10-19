@@ -9,7 +9,7 @@ use Hyperf\Utils\Str;
 use MongoDB\Client;
 use MongoDB\Collection;
 
-class Model
+abstract class Model
 {
     /**
      * @var Client
@@ -210,7 +210,7 @@ class Model
     final public function execute(...$param)
     {
         $method = array_shift($param);
-        return $this->collectionObj->$method(...$param);
+        return serialize($this->collectionObj->$method(...$param));
 //        $parallel = new Parallel($this->config['concurrent']);
 //        $parallel->add(function () use ($param) {
 //            return $this->collectionObj->$method(...$param);
