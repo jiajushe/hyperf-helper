@@ -65,8 +65,9 @@ class ModelTask
             'matched_count' => $res->getMatchedCount(),
             'modified_count' => $res->getModifiedCount(),
             'deleted_count' => $res->getDeletedCount(),
+            'write_concern_error' => $res->getWriteConcernError(),
             'write_errors' => $res->getWriteErrors(),
-            'write_concern_error' => $res->getWriteConcernError()
+            'is_acknowledged' => $res->isAcknowledged(),
         ];
     }
 }
