@@ -15,7 +15,7 @@ class ModelTask
 
     public function manager(array $config): Manager
     {
-        if ($this->manager instanceof Manager) {
+        if (isset($this->manager)) {
             return $this->manager;
         }
         if (!$config['username']) {
@@ -24,7 +24,7 @@ class ModelTask
             $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
         }
         $this->namespace = $config['database'] . '.' . $config['collection'];
-        return new Manager($uri);
+        return $this->manager = new Manager($uri);
     }
 
     /**
