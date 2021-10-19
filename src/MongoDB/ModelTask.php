@@ -118,12 +118,17 @@ abstract class ModelTask
      */
     public function insert(array $document): WriteResult
     {
-        $bulk = new BulkWrite();
+        $bulk = $this->bulk();
         foreach ($document as $row) {
             $bulk->insert($row);
         }
         return $this->manager->executeBulkWrite($this->getNamespace(), $bulk, $this->writeConcern(3000));
     }
 
-
+    public static function __callStatic($name, $arguments)
+    {
+        // TODO: Implement __callStatic() method.
+        pp($name,$arguments);
+        return self::$name(...$arguments);
+    }
 }
