@@ -4,9 +4,9 @@ namespace Jiajushe\HyperfHelper\MongoDB;
 
 
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Str;
-use MongoDB\Driver\Session;
 
 abstract class Model
 {
@@ -14,29 +14,21 @@ abstract class Model
     protected string $connection;
     protected string $collection;
 
+    /**
+     * @Inject
+     * @var ModelTask
+     */
     protected ModelTask $modelTask;
 
     public function __construct()
     {
-        $config = $this->getConfig();
-        $this->modelTask = new ModelTask($config);
-    }
-
-    /**
-     * @return array
-     */
-    final protected function getConfig(): array
-    {
-        if (isset($this->config)) {
-            return $this->config;
-        }
         if (!isset($this->connection)) {
             $this->connection = 'default';
         }
         $configObj = ApplicationContext::getContainer()->get(ConfigInterface::class);
-        $this->config = $configObj->get('mongodb.' . $this->connection);
-        $this->config['collection'] = $this->getCollection();
-        return $this->config;
+        $config = $configObj->get('mongodb.' . $this->connection);
+        $config['collection'] = $this->getCollection();
+        $this->config = $config;
     }
 
     /**
@@ -57,6 +49,6 @@ abstract class Model
      */
     public function create(array $document, int $timeout = 1000): array
     {
-        return $this->modelTask->insert([$document],$timeout);
+        return $this->modelTask->insert($this->config, [$document], $timeout);
     }
 }

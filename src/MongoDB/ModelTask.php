@@ -13,15 +13,18 @@ class ModelTask
     protected Manager $manager;
     protected string $namespace;
 
-    public function __construct(array $config)
+    public function manager(array $config): Manager
     {
+        if ($this->manager instanceof Manager) {
+            return $this->manager;
+        }
         if (!$config['username']) {
             $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
         } else {
             $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
         }
         $this->namespace = $config['database'] . '.' . $config['collection'];
-        $this->manager = new Manager($uri);
+        return $this->manager = new Manager($uri);
     }
 
     /**
@@ -47,13 +50,13 @@ class ModelTask
      * @param int $timeout
      * @return array
      */
-    public function insert(array $document, int $timeout = 1000): array
+    public function insert(array $config,array $document, int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
         foreach ($document as $row) {
             $bulkWrite->insert($row);
         }
-        $res = $this->manager->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'inserted_count' => $res->getInsertedCount(),
             'upserted_count' => $res->getUpsertedCount(),
