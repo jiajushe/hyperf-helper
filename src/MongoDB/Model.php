@@ -4,19 +4,30 @@ namespace Jiajushe\HyperfHelper\MongoDB;
 
 
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Str;
+use Jiajushe\HyperfHelper\Exception\CustomError;
+use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Manager;
+use MongoDB\Driver\Session;
+use MongoDB\Driver\WriteConcern;
 
 abstract class Model
 {
     protected Manager $manager;
-    private $session;
+    protected Session $session;
     protected string $connection;
     protected array $config;
     protected string $database;
     protected string $collection;
     protected string $namespace;
+
+    /**
+     * @Inject
+     * @var ModelTask
+     */
+    protected ModelTask $modelTask;
 
     public function __construct()
     {
@@ -91,18 +102,59 @@ abstract class Model
         return $this->namespace;
     }
 
-    final private function setSession()
-    {
-        $this->session = $this->manager->startSession(['causalConsistency' => true]);
-    }
-
-    final public function startTransaction()
+    /**
+     * @return Session
+     */
+    final public function startTransaction(): Session
     {
         if (!isset($this->session)) {
-            $this->setSession();
+            $this->session = $this->manager->startSession(['causalConsistency' => true]);
         }
         return $this->session;
     }
 
+    /**
+     * @param Session $session
+     * @return Model
+     * @throws CustomError
+     */
+    final public function setSession(Session $session): Model
+    {
+        if (isset($this->session)) {
+            throw new CustomError('session was set');
+        }
+        $this->session = $session;
+        return $this;
+    }
 
+    /**
+     * @return BulkWrite
+     */
+    final protected function bulkWrite(): BulkWrite
+    {
+        return new BulkWrite();
+    }
+
+    /**
+     * @param int $timeout
+     * @return WriteConcern
+     */
+    final protected function writeConcern(int $timeout = 1000): WriteConcern
+    {
+        return new WriteConcern(WriteConcern::MAJORITY, $timeout);
+    }
+
+    /**
+     * @param array $document
+     * @return array
+     */
+    public function create(array $document): array
+    {
+        $bulkWrite = $this->bulkWrite()->insert($document);
+        return $this->modelTask->write(
+            $this->getManager(),
+            $this->getNamespace(),
+            $bulkWrite,
+            ['writeConcern' => $this->writeConcern()]);
+    }
 }
