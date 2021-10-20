@@ -3,6 +3,7 @@
 namespace Jiajushe\HyperfHelper\MongoDB;
 
 use Hyperf\Task\Annotation\Task;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\Exception;
@@ -93,9 +94,10 @@ class ModelTask
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
-        if (!isset($options['projection']['_id']) || $options['projection']['_id']) {
-            $res = $res->each(function ($item){
-                $item->_id = (string)$item->_id;
+        if (!isset($options['projection']['id']) || $options['projection']['id']) {
+            $res = $res->eachSpread(function ($item){
+                $item->id = (string)$item->_id;
+                unset($item['_id']);
                 return $item;
             });
         }

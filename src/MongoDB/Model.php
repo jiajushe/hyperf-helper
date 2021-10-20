@@ -9,6 +9,7 @@ use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Collection;
 use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\Exception\Exception;
 
 abstract class Model
@@ -150,10 +151,10 @@ abstract class Model
      * @throws CustomError
      * @throws Exception
      */
-    public function find(string $_id = null)
+    public function find(string $id = null)
     {
-        if ($_id) {
-            $this->where('_id', '=', $_id);
+        if ($id) {
+            $this->where('id', '=', $id);
         }
         $this->options[self::LIMIT_FIELD] = 1;
         $res = $this->modelTask->query($this->config, $this->filter, $this->options);
@@ -171,6 +172,10 @@ abstract class Model
                 $this->where(...$item);
             }
             return $this;
+        }
+        if ($field === 'id') {
+            $field = '_id';
+            $value = new ObjectId($value);
         }
         if (is_string($field) && $operator === '=') {
             $this->filter[$field] = $value;
