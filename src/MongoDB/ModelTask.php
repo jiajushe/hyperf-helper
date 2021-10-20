@@ -93,7 +93,7 @@ class ModelTask
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
-        if (!isset($options['projection']['id']) || $options['projection']['id']) {
+        if (!isset($options['projection']['_id']) || $options['projection']['_id']) {
             pp('in each');
             $res = $res->each(function ($item){
                 $item->id = (string)$item->_id;
