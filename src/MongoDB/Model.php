@@ -47,7 +47,7 @@ abstract class Model
     /**
      * @var array|int[] 筛选字段
      */
-    protected array $projection = ['_id' => 1];
+    protected array $projection = [];
 
     /**
      * @Inject
@@ -178,7 +178,7 @@ abstract class Model
      */
     final protected function resetAfterQuery()
     {
-        $this->projection = ['_id' => 1];
+        $this->projection = [];
         $this->filter = [];
     }
 
