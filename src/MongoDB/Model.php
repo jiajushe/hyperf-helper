@@ -8,6 +8,7 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
+use MongoDB\Driver\Exception\Exception;
 
 abstract class Model
 {
@@ -103,10 +104,12 @@ abstract class Model
 
     /**
      * 查询多条
+     * @return array
+     * @throws Exception
      */
-    public function all()
+    public function all(): array
     {
-
+        return $this->modelTask->query($this->config, $this->filter);
     }
 
     /**
@@ -118,6 +121,10 @@ abstract class Model
             foreach ($field as $item) {
                 $this->where(...$item);
             }
+            return $this;
+        }
+        if (is_string($field) && $operator === '=') {
+            $this->filter[$field] = $value;
             return $this;
         }
         if (in_array($operator, self::OPERATORS)) {
