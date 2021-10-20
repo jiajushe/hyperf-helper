@@ -94,7 +94,7 @@ class ModelTask
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
 
-        pp($res,$res->getId());
+//        pp($res,$res->getId());
         return $res->toArray();
     }
 }

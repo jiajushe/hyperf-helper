@@ -143,5 +143,13 @@ abstract class Model
         return $this;
     }
 
+    /**
+     * @return array
+     */
+    public function getFilter(): array
+    {
+        return $this->filter;
+    }
+
 
 }
