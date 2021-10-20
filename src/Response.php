@@ -13,12 +13,12 @@ class Response
 {
     /**
      * 正常接口返回数据格式
-     * @param array $response
+     * @param mixed $response
      * @param string $msg
      * @return array
      * @author yun 2021-10-12 11:24:17
      */
-    public function normal(array $response, string $msg = 'success'): array
+    public function normal($response, string $msg = 'success'): array
     {
         return [
             'code' => config('res_code.normal'),

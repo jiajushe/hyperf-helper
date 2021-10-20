@@ -40,11 +40,11 @@ abstract class BaseController
 
     /**
      * json格式返回
-     * @param array $res
+     * @param mixed $res
      * @return \Psr\Http\Message\ResponseInterface
      * @author yun 2021-10-12 14:26:06
      */
-    protected function json(array $res = []): \Psr\Http\Message\ResponseInterface
+    protected function json($res = []): \Psr\Http\Message\ResponseInterface
     {
         $res = $this->responseHelper->normal($res);
         return $this->response->json($res);
