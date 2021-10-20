@@ -14,6 +14,12 @@ use MongoDB\Driver\Exception\Exception;
 abstract class Model
 {
     /**
+     * @Inject
+     * @var ModelTask
+     */
+    protected ModelTask $modelTask;
+
+    /**
      * @var string  连接配置名称
      */
     protected string $connection;
@@ -27,7 +33,6 @@ abstract class Model
      * @var string  表名
      */
     protected string $collection;
-
     protected const OPERATORS = [
         '!=' => '$ne',
         '<>' => '$ne',
@@ -39,29 +44,20 @@ abstract class Model
         'not' => '$not',
         'between' => ['$gte', '$lte'],
     ];
+
     /**
      * @var array 查询表达式
      */
     protected array $filter = [];
-
     protected const PROJECTION_FIELD = 'projection';
     protected const LIMIT_FIELD = 'limit';
+    protected const SKIP_FIELD = 'skip';
+
+
     /**
      * @var array   选项
      */
-    protected array $options = [
-        self::PROJECTION_FIELD => [],
-        self::LIMIT_FIELD => null,
-    ];
-
-
-
-
-    /**
-     * @Inject
-     * @var ModelTask
-     */
-    protected ModelTask $modelTask;
+    protected array $options = [];
 
     public function __construct()
     {
@@ -72,6 +68,19 @@ abstract class Model
         $config = $configObj->get('mongodb.' . $this->connection);
         $config['collection'] = $this->getCollection();
         $this->config = $config;
+        $this->resetOptions();
+    }
+
+    /**
+     * 重置查询选项
+     */
+    final public function resetOptions()
+    {
+        $this->options = [
+            self::PROJECTION_FIELD => [],
+            self::LIMIT_FIELD => null,
+            self::SKIP_FIELD => 0,
+        ];
     }
 
     /**
@@ -108,6 +117,12 @@ abstract class Model
         return $this->modelTask->insert($this->config, $document, $timeout);
     }
 
+    /**
+     * 筛选字段
+     * @param array $field_arr 字段数组
+     * @param bool $choose 是否选择
+     * @return $this
+     */
     public function select(array $field_arr, bool $choose = true): Model
     {
         foreach ($field_arr as $field) {
@@ -123,13 +138,27 @@ abstract class Model
      */
     public function all(): Collection
     {
-        $res = $this->modelTask->query(
-            $this->config,
-            $this->filter,
-            $this->options
-        );
+        $res = $this->modelTask->query($this->config, $this->filter, $this->options);
         $this->resetOptions();
         return $res;
+    }
+
+    /**
+     * 查询一条
+     * @param string|null $_id
+     * @return mixed
+     * @throws CustomError
+     * @throws Exception
+     */
+    public function find(string $_id = null)
+    {
+        if ($_id) {
+            $this->where('_id', '=', $_id);
+        }
+        $this->options[self::LIMIT_FIELD] = 1;
+        $res = $this->modelTask->query($this->config, $this->filter, $this->options);
+        $this->resetOptions();
+        return $res->first();
     }
 
     /**
@@ -177,17 +206,6 @@ abstract class Model
     public function getProjection(): array
     {
         return $this->options[self::PROJECTION_FIELD];
-    }
-
-    /**
-     * 查询后重置
-     */
-    final public function resetOptions()
-    {
-        $this->options = [
-            self::PROJECTION_FIELD => [],
-            self::LIMIT_FIELD => null,
-        ];
     }
 
 
