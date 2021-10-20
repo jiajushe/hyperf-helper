@@ -127,7 +127,7 @@ abstract class Model
             $this->filter[$field] = $value;
             return $this;
         }
-        if (in_array($operator, self::OPERATORS)) {
+        if (!empty(self::OPERATORS[$operator])) {
             if ($operator == 'between') {
                 if (!is_array($value)) {
                     throw new CustomError('$value must be array');
