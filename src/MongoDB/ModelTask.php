@@ -95,7 +95,7 @@ class ModelTask
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
         if (!isset($options['projection']['id']) || $options['projection']['id']) {
-            $res = $res->eachSpread(function ($item){
+            $res = $res->each(function ($item){
                 $item->id = (string)$item->_id;
                 return $item;
             });
