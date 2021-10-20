@@ -110,7 +110,13 @@ abstract class Model
      */
     public function all(): Collection
     {
-        return $this->modelTask->query($this->config, $this->filter);
+        return $this->modelTask->query(
+            $this->config,
+            $this->filter,
+            [
+                'projection' => $this->projection,
+            ]
+        );
     }
 
     /**
