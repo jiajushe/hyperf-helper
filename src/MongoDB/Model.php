@@ -44,10 +44,18 @@ abstract class Model
      */
     protected array $filter = [];
 
+    protected const PROJECTION_FIELD = 'projection';
+    protected const LIMIT_FIELD = 'limit';
     /**
-     * @var array|int[] 筛选字段
+     * @var array   选项
      */
-    protected array $projection = [];
+    protected array $options = [
+        self::PROJECTION_FIELD => [],
+        self::LIMIT_FIELD => null,
+    ];
+
+
+
 
     /**
      * @Inject
@@ -103,7 +111,7 @@ abstract class Model
     public function select(array $field_arr, bool $choose = true): Model
     {
         foreach ($field_arr as $field) {
-            $this->projection[$field] = (int)$choose;
+            $this->options[self::PROJECTION_FIELD][$field] = (int)$choose;
         }
         return $this;
     }
@@ -118,11 +126,9 @@ abstract class Model
         $res = $this->modelTask->query(
             $this->config,
             $this->filter,
-            [
-                'projection' => $this->projection,
-            ]
+            $this->options
         );
-        $this->resetAfterQuery();
+        $this->resetOptions();
         return $res;
     }
 
@@ -170,16 +176,18 @@ abstract class Model
      */
     public function getProjection(): array
     {
-        return $this->projection;
+        return $this->options[self::PROJECTION_FIELD];
     }
 
     /**
      * 查询后重置
      */
-    final protected function resetAfterQuery()
+    final public function resetOptions()
     {
-        $this->projection = [];
-        $this->filter = [];
+        $this->options = [
+            self::PROJECTION_FIELD => [],
+            self::LIMIT_FIELD => null,
+        ];
     }
 
 
