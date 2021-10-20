@@ -3,6 +3,8 @@
 namespace Jiajushe\HyperfHelper\MongoDB;
 
 use Hyperf\Task\Annotation\Task;
+use MongoDB\Client;
+use MongoDB\Collection;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\WriteConcern;
@@ -11,7 +13,9 @@ use MongoDB\Driver\WriteConcern;
 class ModelTask
 {
     protected Manager $manager;
+    protected Client $client;
     protected string $namespace;
+    protected Collection $collection;
 
     public function manager(array $config): Manager
     {
@@ -26,6 +30,35 @@ class ModelTask
         $this->namespace = $config['database'] . '.' . $config['collection'];
         return $this->manager = new Manager($uri);
     }
+
+    public function collection(array $config)
+    {
+        if (isset($this->client)) {
+            return $this->client;
+        }
+        if (!$config['username']) {
+            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
+        } else {
+            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
+        }
+        $this->namespace = $config['database'] . '.' . $config['collection'];
+        $client = new Client($uri);
+        return $this->collection = $client->selectCollection($config['database'],$config['collection']);
+    }
+
+    /**
+     * @Task(timeout=30)
+     * @param array $config
+     * @param array $document
+     * @return int[]
+     */
+    public function create(array $config,array $document): array
+    {
+        $res = $this->collection($config)->insertOne($document);
+        pp($res);
+        return ['res'=>1];
+    }
+
 
     /**
      * @return BulkWrite
