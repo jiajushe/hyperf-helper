@@ -129,7 +129,7 @@ abstract class Model
     /**
      * @throws CustomError
      */
-    public function where($field, string $operator, $value): Model
+    public function where($field, string $operator = '', $value = ''): Model
     {
         if (is_array($field)) {
             foreach ($field as $item) {
