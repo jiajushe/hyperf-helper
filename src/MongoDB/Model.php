@@ -127,6 +127,9 @@ abstract class Model
     public function select(array $field_arr, bool $choose = true): Model
     {
         foreach ($field_arr as $field) {
+            if ($field === 'id') {
+                $field = '_id';
+            }
             $this->options[self::PROJECTION_FIELD][$field] = (int)$choose;
         }
         return $this;

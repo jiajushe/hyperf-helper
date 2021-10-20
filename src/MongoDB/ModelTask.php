@@ -3,7 +3,6 @@
 namespace Jiajushe\HyperfHelper\MongoDB;
 
 use Hyperf\Task\Annotation\Task;
-use MongoDB\BSON\ObjectId;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\Exception;
@@ -95,11 +94,13 @@ class ModelTask
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
         if (!isset($options['projection']['id']) || $options['projection']['id']) {
+            pp('in each');
             $res = $res->each(function ($item){
                 $item->id = (string)$item->_id;
-                return $item;
+                unset($item->_id);
             });
         }
+
         return $res;
     }
 }
