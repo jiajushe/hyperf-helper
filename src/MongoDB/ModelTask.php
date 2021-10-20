@@ -84,17 +84,21 @@ class ModelTask
      * @param array $config
      * @param array $filter
      * @param array $options
-     * @return array
+     * @return \Hyperf\Utils\Collection
      * @throws Exception
      */
-    public function query(array $config, array $filter, array $options = []): array
+    public function query(array $config, array $filter, array $options = []): \Hyperf\Utils\Collection
     {
         $query = new Query($filter, $options);
-
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
-
-//        pp($res,$res->getId());
-        return $res->toArray();
+        $res = \Hyperf\Utils\Collection::make($res);
+        if (!empty($options['projection']) || !empty($options['projection']['_id']) || $options['projection']['_id']) {
+            $res = $res->each(function ($item){
+                $item->_id = (string)$item->_id;
+                return $item;
+            });
+        }
+        return $res;
     }
 }

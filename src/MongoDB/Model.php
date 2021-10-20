@@ -6,6 +6,7 @@ namespace Jiajushe\HyperfHelper\MongoDB;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
+use Hyperf\Utils\Collection;
 use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use MongoDB\Driver\Exception\Exception;
@@ -94,20 +95,20 @@ abstract class Model
         return $this->modelTask->insert($this->config, $document, $timeout);
     }
 
-    public function select(array $field_arr, int $choose = 1): Model
+    public function select(array $field_arr, bool $choose = true): Model
     {
         foreach ($field_arr as $field) {
-            $this->projection[$field] = $choose;
+            $this->projection[$field] = (int)$choose;
         }
         return $this;
     }
 
     /**
      * 查询多条
-     * @return array
+     * @return Collection
      * @throws Exception
      */
-    public function all(): array
+    public function all(): Collection
     {
         return $this->modelTask->query($this->config, $this->filter);
     }
