@@ -7,12 +7,40 @@ use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Str;
+use Jiajushe\HyperfHelper\Exception\CustomError;
 
 abstract class Model
 {
-    protected array $config;
+    /**
+     * 连接配置名称
+     * @var string
+     */
     protected string $connection;
+    /**
+     * 连接配置
+     * @var array
+     */
+    protected array $config;
+    /**
+     * 表名
+     * @var string
+     */
     protected string $collection;
+
+    protected array $filter = [];
+    protected const OPERATORS = [
+        '!=' => '$ne',
+        '<>' => '$ne',
+        '>' => '$gt',
+        '>=' => '$gte',
+        '<' => '$lt',
+        '<=' => '$lte',
+        'in' => '$in',
+        'not' => '$not',
+        'between' => ['$gte', '$lte'],
+    ];
+
+    protected array $projection = [];
 
     /**
      * @Inject
@@ -32,6 +60,7 @@ abstract class Model
     }
 
     /**
+     * 获取表名
      * @return string
      */
     public function getCollection(): string
@@ -43,6 +72,7 @@ abstract class Model
     }
 
     /**
+     * 插入单条
      * @param array $document
      * @param int $timeout
      * @return array
@@ -52,18 +82,59 @@ abstract class Model
         return $this->modelTask->insert($this->config, [$document], $timeout);
     }
 
-    public function createClient(array $document, int $timeout = 1000): array
-    {
-        return $this->modelTask->create($this->config, [$document], $timeout);
-    }
-
+    /**
+     * 插入多条
+     * @param array $document
+     * @param int $timeout
+     * @return array
+     */
     public function insert(array $document, int $timeout = 1000): array
     {
         return $this->modelTask->insert($this->config, $document, $timeout);
     }
 
-    public function insertNoTask(array $document, int $timeout = 1000): array
+    public function select(array $field_arr, int $choose = 1): Model
     {
-        return $this->modelTask->insertNoTask($this->config, $document, $timeout);
+        foreach ($field_arr as $field) {
+            $this->projection[$field] = $choose;
+        }
+        return $this;
     }
+
+    /**
+     * 查询多条
+     */
+    public function all()
+    {
+
+    }
+
+    /**
+     * @throws CustomError
+     */
+    public function where($field, string $operator, $value): Model
+    {
+        if (is_array($field)) {
+            foreach ($field as $item) {
+                $this->where(...$item);
+            }
+            return $this;
+        }
+        if (in_array($operator, self::OPERATORS)) {
+            if ($operator == 'between') {
+                if (!is_array($value)) {
+                    throw new CustomError('$value must be array');
+                }
+                $this->filter[$field] = [self::OPERATORS[0] => $value[0], self::OPERATORS[1] => $value[1]];
+                return $this;
+            }
+            if (in_array($operator, ['in', 'not']) && !is_array($value)) {
+                throw new CustomError('$value must be array');
+            }
+            $this->filter[$field] = [self::OPERATORS[$operator] => $value];
+        }
+        return $this;
+    }
+
+
 }

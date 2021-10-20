@@ -5,8 +5,11 @@ namespace Jiajushe\HyperfHelper\MongoDB;
 use Hyperf\Task\Annotation\Task;
 use MongoDB\Client;
 use MongoDB\Collection;
+use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\BulkWrite;
+use MongoDB\Driver\Query;
+use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 
 
@@ -31,35 +34,6 @@ class ModelTask
         return $this->manager = new Manager($uri);
     }
 
-    public function collection(array $config)
-    {
-        if (isset($this->client)) {
-            return $this->client;
-        }
-        if (!$config['username']) {
-            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
-        } else {
-            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
-        }
-        $this->namespace = $config['database'] . '.' . $config['collection'];
-        $client = new Client($uri);
-        return $this->collection = $client->selectCollection($config['database'],$config['collection']);
-    }
-
-    /**
-     * @Task(timeout=30)
-     * @param array $config
-     * @param array $document
-     * @return int[]
-     */
-    public function create(array $config,array $document): array
-    {
-        $res = $this->collection($config)->insertOne($document);
-        pp($res);
-        return ['res'=>1];
-    }
-
-
     /**
      * @return BulkWrite
      */
@@ -78,6 +52,7 @@ class ModelTask
     }
 
     /**
+     * 插入
      * @Task(timeout=30)
      * @param array $config
      * @param array $document
@@ -105,28 +80,20 @@ class ModelTask
     }
 
     /**
+     * @Task(timeout=30)
      * @param array $config
-     * @param array $document
-     * @param int $timeout
+     * @param array $filter
+     * @param array $options
      * @return array
+     * @throws Exception
      */
-    public function insertNoTask(array $config,array $document, int $timeout = 1000): array
+    public function query(array $config, array $filter, array $options = []): array
     {
-        $bulkWrite = $this->bulkWrite();
-        foreach ($document as $row) {
-            $bulkWrite->insert($row);
-        }
-        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
-        return [
-            'inserted_count' => $res->getInsertedCount(),
-            'upserted_count' => $res->getUpsertedCount(),
-            'upserted_ids' => $res->getUpsertedIds(),
-            'matched_count' => $res->getMatchedCount(),
-            'modified_count' => $res->getModifiedCount(),
-            'deleted_count' => $res->getDeletedCount(),
-            'write_concern_error' => $res->getWriteConcernError(),
-            'write_errors' => $res->getWriteErrors(),
-            'is_acknowledged' => $res->isAcknowledged(),
-        ];
+        $query = new Query($filter, $options);
+
+        $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
+        $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
+        pp($res);
+        return $res->toArray();
     }
 }
