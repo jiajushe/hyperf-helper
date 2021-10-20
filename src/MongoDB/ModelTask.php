@@ -97,7 +97,6 @@ class ModelTask
         if (!isset($options['projection']['id']) || $options['projection']['id']) {
             $res = $res->eachSpread(function ($item){
                 $item->id = (string)$item->_id;
-                unset($item['_id']);
                 return $item;
             });
         }
