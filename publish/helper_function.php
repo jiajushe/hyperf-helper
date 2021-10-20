@@ -11,7 +11,11 @@
 function pp(...$arr)
 {
     foreach ($arr as $item) {
-        print_r($item);
+        if (is_array($item)) {
+            print_r($item);
+        } else {
+            var_dump($item);
+        }
         print_r(PHP_EOL);
     }
 }
