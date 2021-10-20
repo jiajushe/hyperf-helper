@@ -14,22 +14,20 @@ use MongoDB\Driver\Exception\Exception;
 abstract class Model
 {
     /**
-     * 连接配置名称
-     * @var string
+     * @var string  连接配置名称
      */
     protected string $connection;
+
     /**
-     * 连接配置
-     * @var array
+     * @var array   连接配置
      */
     protected array $config;
+
     /**
-     * 表名
-     * @var string
+     * @var string  表名
      */
     protected string $collection;
 
-    protected array $filter = [];
     protected const OPERATORS = [
         '!=' => '$ne',
         '<>' => '$ne',
@@ -41,8 +39,15 @@ abstract class Model
         'not' => '$not',
         'between' => ['$gte', '$lte'],
     ];
+    /**
+     * @var array 查询表达式
+     */
+    protected array $filter = [];
 
-    protected array $projection = [];
+    /**
+     * @var array|int[] 筛选字段
+     */
+    protected array $projection = ['_id' => 1];
 
     /**
      * @Inject
@@ -110,13 +115,15 @@ abstract class Model
      */
     public function all(): Collection
     {
-        return $this->modelTask->query(
+        $res = $this->modelTask->query(
             $this->config,
             $this->filter,
             [
                 'projection' => $this->projection,
             ]
         );
+        $this->resetAfterQuery();
+        return $res;
     }
 
     /**
@@ -156,6 +163,23 @@ abstract class Model
     public function getFilter(): array
     {
         return $this->filter;
+    }
+
+    /**
+     * @return array|int[]
+     */
+    public function getProjection(): array
+    {
+        return $this->projection;
+    }
+
+    /**
+     * 查询后重置
+     */
+    final protected function resetAfterQuery()
+    {
+        $this->projection = ['_id' => 1];
+        $this->filter = [];
     }
 
 
