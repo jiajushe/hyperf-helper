@@ -57,7 +57,7 @@ abstract class Model
     protected array $filter = [];
 
     /**
-     * @var array   选项
+     * @var array   查询选项
      */
     protected array $options = [];
 
@@ -174,6 +174,21 @@ abstract class Model
     }
 
     /**
+     * 删除
+     * @param string|null $id
+     * @param int $timeout
+     * @return array
+     * @throws CustomError
+     */
+    final public function delete(string $id = null, int $timeout = 1000): array
+    {
+        if ($id) {
+            $this->where('id', '=', $id);
+        }
+        return $this->modelTask->delete($this->config, $this->filter, $timeout);
+    }
+
+    /**
      * 筛选字段
      * @param array $field_arr 字段数组
      * @param bool $choose 是否选择
@@ -255,9 +270,9 @@ abstract class Model
     /**
      * @return array|int[]
      */
-    final public function getProjection(): array
+    final public function getOptions(): array
     {
-        return $this->options[self::PROJECTION_OPT];
+        return $this->options;
     }
 
 

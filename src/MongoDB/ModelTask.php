@@ -97,7 +97,14 @@ class ModelTask
         ];
     }
 
-
+    /**
+     * 删除
+     * @Task(timeout=30)
+     * @param array $config
+     * @param array $filter
+     * @param int $timeout
+     * @return array
+     */
     public function delete(array $config, array $filter,int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
