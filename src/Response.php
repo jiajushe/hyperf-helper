@@ -3,6 +3,7 @@
 namespace Jiajushe\HyperfHelper;
 
 use Hyperf\Utils\Codec\Json;
+use Jiajushe\HyperfHelper\Exception\CustomError;
 use Throwable;
 
 /**
@@ -88,7 +89,7 @@ class Response
     public function isDevRes(Throwable $throwable): string
     {
         $app_env = config('app_env');
-        if ($app_env === 'dev') {
+        if ($app_env === 'dev' && $throwable instanceof CustomError) {
             $res = $this->devErrorJson($throwable);
         } else {
             $res = $this->errorJson($throwable);
