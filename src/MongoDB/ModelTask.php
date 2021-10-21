@@ -67,15 +67,10 @@ class ModelTask
         }
         $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
-            'inserted_count' => $res->getInsertedCount(),
-            'upserted_count' => $res->getUpsertedCount(),
-            'upserted_ids' => $res->getUpsertedIds(),
-            'matched_count' => $res->getMatchedCount(),
-            'modified_count' => $res->getModifiedCount(),
-            'deleted_count' => $res->getDeletedCount(),
-            'write_concern_error' => $res->getWriteConcernError(),
-            'write_errors' => $res->getWriteErrors(),
-            'is_acknowledged' => $res->isAcknowledged(),
+            'confirm' => $res->isAcknowledged(),
+            'error' => $res->getWriteConcernError(),
+            'error_arr' => $res->getWriteErrors(),
+            'inserted' => $res->getInsertedCount(),
         ];
     }
 
@@ -94,15 +89,27 @@ class ModelTask
         $bulkWrite->update($filter, ['$set' => $document], ['multi' => true, 'upsert' => false]);
         $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
-            'inserted_count' => $res->getInsertedCount(),
-            'upserted_count' => $res->getUpsertedCount(),
-            'upserted_ids' => $res->getUpsertedIds(),
-            'matched_count' => $res->getMatchedCount(),
-            'modified_count' => $res->getModifiedCount(),
-            'deleted_count' => $res->getDeletedCount(),
-            'write_concern_error' => $res->getWriteConcernError(),
-            'write_errors' => $res->getWriteErrors(),
-            'is_acknowledged' => $res->isAcknowledged(),
+            'confirm' => $res->isAcknowledged(),
+            'error' => $res->getWriteConcernError(),
+            'error_arr' => $res->getWriteErrors(),
+            'matched' => $res->getMatchedCount(),
+            'modified' => $res->getModifiedCount(),
+        ];
+    }
+
+
+    public function delete(array $config, array $filter,int $timeout = 1000): array
+    {
+        $bulkWrite = $this->bulkWrite();
+        $bulkWrite->delete($filter);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        return [
+            'confirm' => $res->isAcknowledged(),
+            'error' => $res->getWriteConcernError(),
+            'error_arr' => $res->getWriteErrors(),
+            'matched' => $res->getMatchedCount(),
+            'modified' => $res->getModifiedCount(),
+            'deleted'=>$res->getDeletedCount(),
         ];
     }
 
