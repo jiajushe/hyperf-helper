@@ -80,7 +80,7 @@ abstract class Model
     {
         $this->options = [
             self::PROJECTION_FIELD => [],
-            self::LIMIT_FIELD => null,
+            self::LIMIT_FIELD => 0,
             self::SKIP_FIELD => 0,
         ];
         return $this;
