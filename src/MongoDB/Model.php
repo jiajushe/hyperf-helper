@@ -46,9 +46,10 @@ abstract class Model
         'between' => ['$gte', '$lte'],
     ];
 
-    protected const PROJECTION_FIELD = 'projection';
-    protected const LIMIT_FIELD = 'limit';
-    protected const SKIP_FIELD = 'skip';
+    protected const PROJECTION_OPT = 'projection';
+    protected const LIMIT_OPT = 'limit';
+    protected const SKIP_OPT = 'skip';
+    protected const SORT_OPT = 'sort';
 
     /**
      * @var array 查询表达式
@@ -79,9 +80,10 @@ abstract class Model
     final public function resetOptions(): Model
     {
         $this->options = [
-            self::PROJECTION_FIELD => [],
-            self::LIMIT_FIELD => 0,
-            self::SKIP_FIELD => 0,
+            self::PROJECTION_OPT => [], //筛选字段
+            self::LIMIT_OPT => 0,   //返回的最大条数
+            self::SKIP_OPT => 0,    //跳过多少条
+            self::SORT_OPT => [],   //排序
         ];
         return $this;
     }
@@ -154,7 +156,7 @@ abstract class Model
         if ($id) {
             $this->where('id', '=', $id);
         }
-        $this->options[self::LIMIT_FIELD] = 1;
+        $this->options[self::LIMIT_OPT] = 1;
         $res = $this->modelTask->query($this->config, $this->filter, $this->options);
         $this->resetOptions();
         return $res->first();
@@ -183,7 +185,7 @@ abstract class Model
             if ($field === 'id') {
                 $field = '_id';
             }
-            $this->options[self::PROJECTION_FIELD][$field] = (int)$choose;
+            $this->options[self::PROJECTION_OPT][$field] = (int)$choose;
         }
         return $this;
     }
@@ -220,6 +222,25 @@ abstract class Model
     }
 
     /**
+     * 排序
+     * @param $field
+     * @param string $opt
+     * @return $this
+     */
+    final public function sort($field, string $opt = 'asc'): Model
+    {
+        $opt_arr = ['asc' => 1, 'desc' => -1];
+        if (is_array($field)) {
+            foreach ($field as $key => $val) {
+                $this->options[self::SORT_OPT][$key] = $opt_arr[$val];
+            }
+        } else {
+            $this->options[self::SORT_OPT][$field] = $opt_arr[$opt];
+        }
+        return $this;
+    }
+
+    /**
      * @return array
      */
     final public function getFilter(): array
@@ -232,7 +253,7 @@ abstract class Model
      */
     final public function getProjection(): array
     {
-        return $this->options[self::PROJECTION_FIELD];
+        return $this->options[self::PROJECTION_OPT];
     }
 
 
