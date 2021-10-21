@@ -232,7 +232,11 @@ abstract class Model
         $opt_arr = ['asc' => 1, 'desc' => -1];
         if (is_array($field)) {
             foreach ($field as $key => $val) {
-                $this->options[self::SORT_OPT][$key] = $opt_arr[$val];
+                if (is_int($key)) {
+                    $this->options[self::SORT_OPT][$val] = $opt_arr['asc'];
+                } else {
+                    $this->options[self::SORT_OPT][$key] = $opt_arr[$val];
+                }
             }
         } else {
             $this->options[self::SORT_OPT][$field] = $opt_arr[$opt];

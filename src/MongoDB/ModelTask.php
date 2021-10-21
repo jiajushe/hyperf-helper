@@ -91,7 +91,7 @@ class ModelTask
     public function update(array $config, array $filter, array $document, int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
-        $bulkWrite->update($filter, ['$set' => $document], ['multi' => false, 'upsert' => false]);
+        $bulkWrite->update($filter, ['$set' => $document], ['multi' => true, 'upsert' => false]);
         $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'inserted_count' => $res->getInsertedCount(),
