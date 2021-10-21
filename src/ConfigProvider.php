@@ -38,6 +38,13 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/mongodb.php',
                     'destination' => BASE_PATH . '/config/autoload/mongodb.php',
                 ],
+//                jwt配置文件
+                [
+                    'id' => 'jwt',
+                    'description' => 'The config of jwt.',
+                    'source' => __DIR__ . '/../publish/jwt.php',
+                    'destination' => BASE_PATH . '/config/autoload/jwt.php',
+                ],
             ],
         ];
     }

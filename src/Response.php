@@ -16,13 +16,14 @@ class Response
      * 正常接口返回数据格式
      * @param mixed $response
      * @param string $msg
+     * @param int|null $code
      * @return array
      * @author yun 2021-10-12 11:24:17
      */
-    public function normal($response, string $msg = 'success'): array
+    public function normal($response, string $msg = 'success', int $code = null): array
     {
         return [
-            'code' => config('res_code.normal'),
+            'code' => $code === null ? config('res_code.normal') : $code,
             'msg' => $msg,
             'response' => $response,
         ];
@@ -74,7 +75,7 @@ class Response
      * @return bool
      * @author yun 2021-10-12 14:02:57
      */
-    public function isDev():bool
+    public function isDev(): bool
     {
         $app_env = config('app_env');
         return $app_env === 'dev';
