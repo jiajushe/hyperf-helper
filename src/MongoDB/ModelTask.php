@@ -59,7 +59,7 @@ class ModelTask
      * @param int $timeout
      * @return array
      */
-    public function insert(array $config,array $document, int $timeout = 1000): array
+    public function insert(array $config, array $document, int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
         foreach ($document as $row) {
@@ -80,6 +80,34 @@ class ModelTask
     }
 
     /**
+     * 更新
+     * @Task(timeout=30)
+     * @param array $config
+     * @param array $filter
+     * @param array $document
+     * @param int $timeout
+     * @return array
+     */
+    public function update(array $config, array $filter, array $document, int $timeout = 1000): array
+    {
+        $bulkWrite = $this->bulkWrite();
+        $bulkWrite->update($filter, ['$set' => $document], ['multi' => false, 'upsert' => false]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        return [
+            'inserted_count' => $res->getInsertedCount(),
+            'upserted_count' => $res->getUpsertedCount(),
+            'upserted_ids' => $res->getUpsertedIds(),
+            'matched_count' => $res->getMatchedCount(),
+            'modified_count' => $res->getModifiedCount(),
+            'deleted_count' => $res->getDeletedCount(),
+            'write_concern_error' => $res->getWriteConcernError(),
+            'write_errors' => $res->getWriteErrors(),
+            'is_acknowledged' => $res->isAcknowledged(),
+        ];
+    }
+
+    /**
+     * 查询
      * @Task(timeout=30)
      * @param array $config
      * @param array $filter
@@ -94,8 +122,7 @@ class ModelTask
         $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
         if (!isset($options['projection']['_id']) || $options['projection']['_id']) {
-            pp('in each');
-            $res = $res->each(function ($item){
+            $res = $res->each(function ($item) {
                 $item->id = (string)$item->_id;
                 unset($item->_id);
             });

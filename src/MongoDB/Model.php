@@ -35,6 +35,7 @@ abstract class Model
      */
     protected string $collection;
     protected const OPERATORS = [
+        '=' => '$eq',
         '!=' => '$ne',
         '<>' => '$ne',
         '>' => '$gt',
@@ -42,18 +43,17 @@ abstract class Model
         '<' => '$lt',
         '<=' => '$lte',
         'in' => '$in',
-        'not' => '$not',
         'between' => ['$gte', '$lte'],
     ];
+
+    protected const PROJECTION_FIELD = 'projection';
+    protected const LIMIT_FIELD = 'limit';
+    protected const SKIP_FIELD = 'skip';
 
     /**
      * @var array 查询表达式
      */
     protected array $filter = [];
-    protected const PROJECTION_FIELD = 'projection';
-    protected const LIMIT_FIELD = 'limit';
-    protected const SKIP_FIELD = 'skip';
-
 
     /**
      * @var array   选项
@@ -74,21 +74,33 @@ abstract class Model
 
     /**
      * 重置查询选项
+     * @return Model
      */
-    final public function resetOptions()
+    final public function resetOptions(): Model
     {
         $this->options = [
             self::PROJECTION_FIELD => [],
             self::LIMIT_FIELD => null,
             self::SKIP_FIELD => 0,
         ];
+        return $this;
+    }
+
+    /**
+     * 重置查询表达式
+     * @return $this
+     */
+    final public function resetFilter(): Model
+    {
+        $this->filter = [];
+        return $this;
     }
 
     /**
      * 获取表名
      * @return string
      */
-    public function getCollection(): string
+    final public function getCollection(): string
     {
         if (!isset($this->collection)) {
             $this->collection = Str::snake(Str::afterLast(get_class($this), '\\'));
@@ -102,7 +114,7 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    public function create(array $document, int $timeout = 1000): array
+    final public function create(array $document, int $timeout = 1000): array
     {
         return $this->modelTask->insert($this->config, [$document], $timeout);
     }
@@ -113,26 +125,9 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    public function insert(array $document, int $timeout = 1000): array
+    final public function insert(array $document, int $timeout = 1000): array
     {
         return $this->modelTask->insert($this->config, $document, $timeout);
-    }
-
-    /**
-     * 筛选字段
-     * @param array $field_arr 字段数组
-     * @param bool $choose 是否选择
-     * @return $this
-     */
-    public function select(array $field_arr, bool $choose = true): Model
-    {
-        foreach ($field_arr as $field) {
-            if ($field === 'id') {
-                $field = '_id';
-            }
-            $this->options[self::PROJECTION_FIELD][$field] = (int)$choose;
-        }
-        return $this;
     }
 
     /**
@@ -140,7 +135,7 @@ abstract class Model
      * @return Collection
      * @throws Exception
      */
-    public function all(): Collection
+    final public function all(): Collection
     {
         $res = $this->modelTask->query($this->config, $this->filter, $this->options);
         $this->resetOptions();
@@ -149,12 +144,12 @@ abstract class Model
 
     /**
      * 查询一条
-     * @param string|null $_id
+     * @param string|null $id
      * @return mixed
      * @throws CustomError
      * @throws Exception
      */
-    public function find(string $id = null)
+    final public function find(string $id = null)
     {
         if ($id) {
             $this->where('id', '=', $id);
@@ -166,9 +161,37 @@ abstract class Model
     }
 
     /**
+     * 更新
+     * @param array $document
+     * @param int $timeout
+     * @return array
+     */
+    final public function update(array $document, int $timeout = 1000): array
+    {
+        return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
+    }
+
+    /**
+     * 筛选字段
+     * @param array $field_arr 字段数组
+     * @param bool $choose 是否选择
+     * @return $this
+     */
+    final public function select(array $field_arr, bool $choose = true): Model
+    {
+        foreach ($field_arr as $field) {
+            if ($field === 'id') {
+                $field = '_id';
+            }
+            $this->options[self::PROJECTION_FIELD][$field] = (int)$choose;
+        }
+        return $this;
+    }
+
+    /**
      * @throws CustomError
      */
-    public function where($field, string $operator = '', $value = ''): Model
+    final public function where($field, string $operator = '', $value = ''): Model
     {
         if (is_array($field)) {
             foreach ($field as $item) {
@@ -180,10 +203,6 @@ abstract class Model
             $field = '_id';
             $value = new ObjectId($value);
         }
-        if (is_string($field) && $operator === '=') {
-            $this->filter[$field] = $value;
-            return $this;
-        }
         if (!empty(self::OPERATORS[$operator])) {
             if ($operator == 'between') {
                 if (!is_array($value)) {
@@ -192,7 +211,7 @@ abstract class Model
                 $this->filter[$field] = [self::OPERATORS[0] => $value[0], self::OPERATORS[1] => $value[1]];
                 return $this;
             }
-            if (in_array($operator, ['in', 'not']) && !is_array($value)) {
+            if ($operator == 'in' && !is_array($value)) {
                 throw new CustomError('$value must be array');
             }
             $this->filter[$field] = [self::OPERATORS[$operator] => $value];
@@ -203,7 +222,7 @@ abstract class Model
     /**
      * @return array
      */
-    public function getFilter(): array
+    final public function getFilter(): array
     {
         return $this->filter;
     }
@@ -211,7 +230,7 @@ abstract class Model
     /**
      * @return array|int[]
      */
-    public function getProjection(): array
+    final public function getProjection(): array
     {
         return $this->options[self::PROJECTION_FIELD];
     }
