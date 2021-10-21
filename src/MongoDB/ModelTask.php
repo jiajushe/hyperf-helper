@@ -114,8 +114,6 @@ class ModelTask
             'confirm' => $res->isAcknowledged(),
             'error' => $res->getWriteConcernError(),
             'error_arr' => $res->getWriteErrors(),
-            'matched' => $res->getMatchedCount(),
-            'modified' => $res->getModifiedCount(),
             'deleted'=>$res->getDeletedCount(),
         ];
     }

@@ -44,7 +44,7 @@ abstract class BaseController
      * @return \Psr\Http\Message\ResponseInterface
      * @author yun 2021-10-12 14:26:06
      */
-    protected function json($res = []): \Psr\Http\Message\ResponseInterface
+    protected function json($res = ''): \Psr\Http\Message\ResponseInterface
     {
         $res = $this->responseHelper->normal($res);
         return $this->response->json($res);
