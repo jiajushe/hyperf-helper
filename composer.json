@@ -12,8 +12,7 @@
         "hyperf/http-message": "~2.2.0",
         "hyperf/http-server": "~2.2.0",
         "hyperf/task": "~2.2.0",
-        "hyperf/utils": "~2.2.0",
-        "mongodb/mongodb": ">=1.9"
+        "hyperf/utils": "~2.2.0"
     },
     "require-dev": {
         "hyperf/ide-helper": ">=2.2",
