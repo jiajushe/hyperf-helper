@@ -183,6 +183,29 @@ abstract class Model
     }
 
     /**
+     * 分页
+     * @param int $page
+     * @param int $limit
+     * @return array
+     * @throws Exception
+     */
+    final public function page(int $page = 1, int $limit = 15): array
+    {
+        $total = $this->count();
+        $skip = ($page - 1) * $limit;
+        $total_page = (int)ceil($total / $limit);
+        $this->skip($skip)->limit($limit);
+        $data = $this->limit($limit)->skip($skip)->all();
+        return [
+            'total' => $total,
+            'total_page' => $total_page,
+            'current_page' => $page,
+            'pre_page' => $limit,
+            'data' => $data
+        ];
+    }
+
+    /**
      * 更新
      * @param array $document
      * @param int $timeout
@@ -232,7 +255,7 @@ abstract class Model
         if (!$this->options[self::SKIP_OPT]) {
             unset($this->options[self::SKIP_OPT]);
         }
-        return $this->modelTask->count($this->config,$this->filter,$this->options);
+        return $this->modelTask->count($this->config, $this->filter, $this->options);
     }
 
     /**
