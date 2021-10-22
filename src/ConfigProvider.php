@@ -45,6 +45,13 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/jwt.php',
                     'destination' => BASE_PATH . '/config/autoload/jwt.php',
                 ],
+//                异常处理配置文件
+                [
+                    'id' => 'exceptions',
+                    'description' => 'The config of jwt.',
+                    'source' => __DIR__ . '/../publish/exceptions.php',
+                    'destination' => BASE_PATH . '/config/autoload/exceptions.php',
+                ],
             ],
         ];
     }
