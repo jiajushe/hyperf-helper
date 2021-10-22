@@ -162,9 +162,7 @@ abstract class Model
      */
     final public function all(): Collection
     {
-        $res = $this->modelTask->query($this->config, $this->filter, $this->options);
-        $this->resetOptions();
-        return $res;
+        return $this->modelTask->query($this->config, $this->filter, $this->options);
     }
 
     /**
@@ -181,7 +179,6 @@ abstract class Model
         }
         $this->options[self::LIMIT_OPT] = 1;
         $res = $this->modelTask->query($this->config, $this->filter, $this->options);
-        $this->resetOptions();
         return $res->first();
     }
 
