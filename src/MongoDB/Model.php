@@ -370,10 +370,10 @@ abstract class Model
         $created_at = $this->created_at;
         $updated_at = $this->updated_at;
         foreach ($data as $item) {
-            if ($item->$created_at) {
+            if ($created_at && $item->$created_at) {
                 $item->$created_at = date($format, $item->$created_at);
             }
-            if ($item->$updated_at) {
+            if ($updated_at && $item->$updated_at) {
                 $item->$updated_at = date($format, $item->$updated_at);
             }
         }
