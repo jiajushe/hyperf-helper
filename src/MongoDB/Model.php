@@ -292,6 +292,26 @@ abstract class Model
     }
 
     /**
+     * @param int $num
+     * @return $this
+     */
+    final public function skip(int $num): Model
+    {
+        $this->options[self::SKIP_OPT] = $num;
+        return $this;
+    }
+
+    /**
+     * @param int $num
+     * @return $this
+     */
+    final public function limit(int $num): Model
+    {
+        $this->options[self::LIMIT_OPT] = $num;
+        return $this;
+    }
+
+    /**
      * @return array
      */
     final public function getFilter(): array
