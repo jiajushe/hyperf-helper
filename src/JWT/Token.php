@@ -16,6 +16,7 @@ use UnexpectedValueException;
 class Token
 {
     /**
+     * 生成token
      * @param string $model
      * @param stdClass $user
      * @return string
@@ -44,6 +45,7 @@ class Token
     }
 
     /**
+     * 校验token
      * @param string $model
      * @param string $user_token
      * @return object
@@ -72,8 +74,20 @@ class Token
         }
     }
 
-    public function refresh(stdClass $payload)
+    /**
+     * 刷新token
+     * @param stdClass $payload
+     * @return string|null
+     * @throws CustomError
+     */
+    public function refresh(stdClass $payload): ?string
     {
-
+        if ($payload->refresh < ($payload->exp - time())) {
+            return null;
+        }
+        $user = $payload->info;
+        $user->id = $payload->sub;
+        $model = $payload->iss;
+        return $this->make($model,$user);
     }
 }
