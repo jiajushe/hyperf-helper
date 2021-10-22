@@ -7,6 +7,7 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Firebase\JWT\SignatureInvalidException;
 use InvalidArgumentException;
+use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;
 use Throwable;
 use stdClass;
@@ -18,7 +19,7 @@ class Token
      * @param string $model
      * @param stdClass $user
      * @return string
-     * @throws Throwable
+     * @throws CustomError
      */
     public function make(string $model, stdClass $user): string
     {
@@ -38,7 +39,7 @@ class Token
             ];
             return JWT::encode($payload, $config['secret']);
         } catch (Throwable $t) {
-            throw $t;
+            throw new CustomError($t->getMessage());
         }
     }
 
@@ -46,7 +47,7 @@ class Token
      * @param string $model
      * @param string $user_token
      * @return object
-     * @throws CustomNormal
+     * @throws CustomNormal|CustomError
      */
     public function verify(string $model, string $user_token): object
     {
@@ -57,7 +58,6 @@ class Token
             if ($payload->iss != $model) {
                 throw new SignatureInvalidException();
             }
-            pp($payload);
             return $payload;
         } catch (InvalidArgumentException $e) {
             throw new CustomNormal('没有签名', config('res_code.token'));
@@ -67,6 +67,13 @@ class Token
             throw new CustomNormal('签名已过期', config('res_code.token'));
         } catch (SignatureInvalidException | UnexpectedValueException $e) {
             throw new CustomNormal('签名无效', config('res_code.token'));
+        } catch (Throwable $t) {
+            throw new CustomError($t->getMessage());
         }
+    }
+
+    public function refresh(stdClass $payload)
+    {
+
     }
 }
