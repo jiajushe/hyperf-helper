@@ -12,5 +12,6 @@ return [
     ],
     'normal' => 0,  //正常返回
     'alert' => 1,   //提示信息
+    'token' => 2,   //token
     'error' => 5,   //系统错误
 ];

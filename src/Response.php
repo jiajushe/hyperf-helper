@@ -3,7 +3,7 @@
 namespace Jiajushe\HyperfHelper;
 
 use Hyperf\Utils\Codec\Json;
-use Jiajushe\HyperfHelper\Exception\CustomAlert;
+use Jiajushe\HyperfHelper\Exception\CustomNormal;
 use Throwable;
 
 /**
@@ -89,8 +89,7 @@ class Response
      */
     public function isDevRes(Throwable $throwable): string
     {
-        $app_env = config('app_env');
-        if ($app_env === 'dev' && !($throwable instanceof CustomAlert)) {
+        if ($this->isDev() && !($throwable instanceof CustomNormal)) {
             $res = $this->devErrorJson($throwable);
         } else {
             $res = $this->errorJson($throwable);

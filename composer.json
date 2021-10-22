@@ -4,8 +4,8 @@
     "type": "library",
     "require": {
         "php": ">=7.4",
-        "ext-mongodb": "1.10.*",
-        "firebase/php-jwt": "5.4.*",
+        "ext-mongodb": "~1.10.0",
+        "firebase/php-jwt": "~5.4.0",
         "hyperf/config": "~2.2.0",
         "hyperf/contract": "~2.2.0",
         "hyperf/di": "~2.2.0",
