@@ -57,6 +57,7 @@ class Token
             if ($payload->iss != $model) {
                 throw new SignatureInvalidException();
             }
+            pp($payload);
             return $payload;
         } catch (InvalidArgumentException $e) {
             throw new CustomNormal('没有签名', config('res_code.token'));
