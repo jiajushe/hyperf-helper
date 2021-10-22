@@ -221,6 +221,15 @@ abstract class Model
     }
 
     /**
+     * 获取数据条数
+     * @return int
+     */
+    final public function count(): int
+    {
+        return $this->modelTask->count($this->config,$this->filter,$this->options);
+    }
+
+    /**
      * 筛选字段
      * @param array $field_arr 字段数组
      * @param bool $choose 是否选择

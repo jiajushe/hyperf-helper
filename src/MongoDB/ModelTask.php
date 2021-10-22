@@ -34,6 +34,20 @@ class ModelTask
         return $this->manager = new Manager($uri);
     }
 
+    public function collection(array $config): Collection
+    {
+        if (isset($this->collection)) {
+            return $this->collection;
+        }
+        if (!$config['username']) {
+            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
+        } else {
+            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
+        }
+        $this->client = new Client($uri);
+        return $this->collection = $this->client->selectCollection($config['database'], $config['collection']);
+    }
+
     /**
      * @return BulkWrite
      */
@@ -105,7 +119,7 @@ class ModelTask
      * @param int $timeout
      * @return array
      */
-    public function delete(array $config, array $filter,int $timeout = 1000): array
+    public function delete(array $config, array $filter, int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->delete($filter);
@@ -114,7 +128,7 @@ class ModelTask
             'confirm' => $res->isAcknowledged(),
             'error' => $res->getWriteConcernError(),
             'error_arr' => $res->getWriteErrors(),
-            'deleted'=>$res->getDeletedCount(),
+            'deleted' => $res->getDeletedCount(),
         ];
     }
 
@@ -141,5 +155,18 @@ class ModelTask
         }
 
         return $res;
+    }
+
+    /**
+     * 获取数据条数
+     * @Task (timeout=30)
+     * @param array $config
+     * @param array $filter
+     * @param array $options
+     * @return int
+     */
+    public function count(array $config, array $filter = [], array $options = []): int
+    {
+        return $this->collection($config)->countDocuments($filter, $options);
     }
 }
