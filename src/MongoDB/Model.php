@@ -226,6 +226,12 @@ abstract class Model
      */
     final public function count(): int
     {
+        if (!$this->options[self::LIMIT_OPT]) {
+            unset($this->options[self::LIMIT_OPT]);
+        }
+        if (!$this->options[self::SKIP_OPT]) {
+            unset($this->options[self::SKIP_OPT]);
+        }
         return $this->modelTask->count($this->config,$this->filter,$this->options);
     }
 
