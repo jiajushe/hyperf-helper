@@ -144,6 +144,7 @@ abstract class Model
             return $document;
         }
         $time = time();
+        pp(date("Y-m-d H:i:s"), $time);
         foreach ($document as $key => $value) {
             if ($this->created_at && empty($value[$this->created_at])) {
                 $document[$key][$this->created_at] = $time;
@@ -365,19 +366,19 @@ abstract class Model
         return $this->options;
     }
 
-    final public function changeTime(array $data, string $format='Y-m-d H:i:s'): array
+    final public function changeTime(array $data, string $format = 'Y-m-d H:i:s'): array
     {
-            $created_at = $this->created_at;
-            $updated_at = $this->updated_at;
-            foreach ($data as $item) {
-                if ($item->$created_at) {
-                    $item->$created_at = date($format, $item->$created_at);
-                }
-                if ($item->$updated_at) {
-                    $item->$updated_at = date($format, $item->$updated_at);
-                }
+        $created_at = $this->created_at;
+        $updated_at = $this->updated_at;
+        foreach ($data as $item) {
+            if ($item->$created_at) {
+                $item->$created_at = date($format, $item->$created_at);
             }
-            return $data;
+            if ($item->$updated_at) {
+                $item->$updated_at = date($format, $item->$updated_at);
+            }
         }
+        return $data;
+    }
 
 }
