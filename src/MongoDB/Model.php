@@ -365,7 +365,7 @@ abstract class Model
         return $this->options;
     }
 
-    final public function changeTime(array $data, string $format='Y-m-d h:i:s'): array
+    final public function changeTime(array $data, string $format='Y-m-d H:i:s'): array
     {
             $created_at = $this->created_at;
             $updated_at = $this->updated_at;
