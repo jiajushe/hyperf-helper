@@ -34,6 +34,7 @@ abstract class Model
      * @var string  表名
      */
     protected string $collection;
+
     protected const OPERATORS = [
         '=' => '$eq',
         '!=' => '$ne',
@@ -46,15 +47,18 @@ abstract class Model
         'between' => ['$gte', '$lte'],
     ];
 
+    /**
+     * @var array 查询表达式
+     */
+    protected array $filter = [];
+
     protected const PROJECTION_OPT = 'projection';
     protected const LIMIT_OPT = 'limit';
     protected const SKIP_OPT = 'skip';
     protected const SORT_OPT = 'sort';
 
-    /**
-     * @var array 查询表达式
-     */
-    protected array $filter = [];
+    protected string $created_at = 'created_at';
+    protected string $updated_at = 'updated_at';
 
     /**
      * @var array   查询选项
@@ -118,6 +122,7 @@ abstract class Model
      */
     final public function create(array $document, int $timeout = 1000): array
     {
+        $document = $this->addTime([$document]);
         return $this->modelTask->insert($this->config, [$document], $timeout);
     }
 
@@ -129,7 +134,25 @@ abstract class Model
      */
     final public function insert(array $document, int $timeout = 1000): array
     {
+        $document = $this->addTime($document);
         return $this->modelTask->insert($this->config, $document, $timeout);
+    }
+
+    final protected function addTime(array $document): array
+    {
+        if (!$this->created_at && !$this->updated_at) {
+            return $document;
+        }
+        $time = time();
+        foreach ($document as $key => $value) {
+            if ($this->created_at && empty($value[$this->created_at])) {
+                $document[$key][$this->created_at] = $time;
+            }
+            if ($this->updated_at && empty($value[$this->updated_at])) {
+                $document[$key][$this->updated_at] = $time;
+            }
+        }
+        return $document;
     }
 
     /**
@@ -171,6 +194,17 @@ abstract class Model
     final public function update(array $document, int $timeout = 1000): array
     {
         return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
+    }
+
+    final protected function addUpdated(array $document): array
+    {
+        if (!$this->updated_at) {
+            return $document;
+        }
+        if (empty($document[$this->updated_at])) {
+            $document[$this->updated_at] = time();
+        }
+        return $document;
     }
 
     /**
