@@ -189,7 +189,7 @@ abstract class Model
      * @return array
      * @throws Exception
      */
-    final public function page(int $page = 1, int $limit = 15): array
+    final public function paginate(int $page = 1, int $limit = 15): array
     {
         $total = $this->count();
         $skip = ($page - 1) * $limit;
@@ -199,7 +199,7 @@ abstract class Model
         return [
             'total' => $total,
             'total_page' => $total_page,
-            'current_page' => $page,
+            'current_page' => $page > $total_page ? $total_page : $page,
             'pre_page' => $limit,
             'data' => $data
         ];
