@@ -193,6 +193,7 @@ abstract class Model
      */
     final public function update(array $document, int $timeout = 1000): array
     {
+        $document = $this->addUpdated($document);
         return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
     }
 
