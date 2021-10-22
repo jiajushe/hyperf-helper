@@ -20,7 +20,7 @@ class MongoDB  extends ExceptionHandler
     {
 //        todo  错误记录
         pp('MongoDB EXCEPTION');
-        $res = (new Response())->isDevRes($throwable);
+        $res = (new Response())->error($throwable);
         $this->stopPropagation();
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
             ->withStatus(config('res_code.http.system_error'))

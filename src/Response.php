@@ -82,12 +82,12 @@ class Response
     }
 
     /**
-     * 判断是否dev环境返回错误格式
+     * 返回错误数据格式
      * @param Throwable $throwable
      * @return string
      * @author yun 2021-10-12 14:02:53
      */
-    public function isDevRes(Throwable $throwable): string
+    public function error(Throwable $throwable): string
     {
         if ($this->isDev() && !($throwable instanceof CustomNormal)) {
             $res = $this->devErrorJson($throwable);

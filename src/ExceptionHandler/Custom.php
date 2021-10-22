@@ -16,7 +16,7 @@ class Custom extends ExceptionHandler
 {
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-        $res = (new Response())->isDevRes($throwable);
+        $res = (new Response())->error($throwable);
         if (method_exists($throwable, 'getHttpCode')) {
             $http_code = $throwable->getHttpCode();
         } else {
