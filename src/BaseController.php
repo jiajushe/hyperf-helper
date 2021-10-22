@@ -34,9 +34,9 @@ abstract class BaseController
 
     /**
      * @Inject()
-     * @var Response
+     * @var ResponseHelper
      */
-    protected Response $responseHelper;
+    protected ResponseHelper $responseHelper;
 
     /**
      * json格式返回

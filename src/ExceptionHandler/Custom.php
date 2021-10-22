@@ -4,7 +4,7 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
-use Jiajushe\HyperfHelper\Response;
+use Jiajushe\HyperfHelper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -16,7 +16,7 @@ class Custom extends ExceptionHandler
 {
     public function handle(Throwable $throwable, ResponseInterface $response): ResponseInterface
     {
-        $res = (new Response())->error($throwable);
+        $res = (new ResponseHelper())->error($throwable);
         if (method_exists($throwable, 'getHttpCode')) {
             $http_code = $throwable->getHttpCode();
         } else {

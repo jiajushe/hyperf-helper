@@ -5,7 +5,7 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Utils\Str;
-use Jiajushe\HyperfHelper\Response;
+use Jiajushe\HyperfHelper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -20,7 +20,7 @@ class MongoDB  extends ExceptionHandler
     {
 //        todo  错误记录
         pp('MongoDB EXCEPTION');
-        $res = (new Response())->error($throwable);
+        $res = (new ResponseHelper())->error($throwable);
         $this->stopPropagation();
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
             ->withStatus(config('res_code.http.system_error'))
