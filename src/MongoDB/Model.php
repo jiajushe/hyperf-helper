@@ -144,7 +144,6 @@ abstract class Model
             return $document;
         }
         $time = time();
-        pp(date("Y-m-d H:i:s"), $time);
         foreach ($document as $key => $value) {
             if ($this->created_at && empty($value[$this->created_at])) {
                 $document[$key][$this->created_at] = $time;
