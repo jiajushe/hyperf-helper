@@ -55,9 +55,9 @@ class ConfigProvider
 //                volumes
                 [
                     'id' => 'volumes',
-                    'description' => 'The config of jwt.',
+                    'description' => 'The volumes.',
                     'source' => __DIR__ . '/../publish/volumes',
-                    'destination' => BASE_PATH . '/volumes',
+                    'destination' => BASE_PATH . '/v/volumes',
                 ],
             ],
         ];
