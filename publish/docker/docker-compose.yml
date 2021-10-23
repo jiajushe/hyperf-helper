@@ -1,0 +1,18 @@
+version: "3.8"
+services:
+  hyperf-server-test:
+    container_name: ${CONTAINER_NAME:-hyperf-server-test}
+    build: .
+    image: ${IMAGE_NAME:-hyperf-server-test}
+    volumes:
+      - ${VOLUMES_MONGODB_DATABASES_PATH:-/server/docker-volumes/hyperf-server-test/data/mongodb/databases}:/server/data/mongodb/databases
+      - ${VOLUMES_MONGODB_LOGS_PATH:-/server/docker-volumes/hyperf-server-test/data/mongodb/logs}:/server/data/mongodb/logs
+      - ${VOLUMES_MONGODB_CONFIG_PATH:-/server/docker-volumes/hyperf-server-test/config/mongodb}:/server/config/mongodb
+      - ${VOLUMES_PHP_CONFIG_PATH:-/server/docker-volumes/hyperf-server-test/config/php}:/server/config/php
+      - ${VOLUMES_SUPERVISOR_CONF_PATH:-/server/docker-volumes/hyperf-server-test/config/supervisor}:/etc/supervisor/conf.d
+      - ${VOLUMES_SUPERVISOR_LOGS_PATH:-/server/docker-volumes/hyperf-server-test/data/supervisor/logs}:/server/data/supervisor/logs
+    networks:
+      - home-club
+networks:
+  home-club:
+    external: true

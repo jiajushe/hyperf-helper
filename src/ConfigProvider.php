@@ -66,6 +66,20 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/.gitignore',
                     'destination' => BASE_PATH . '/.gitignore',
                 ],
+//                dockerfile
+                [
+                    'id' => 'dockerfile',
+                    'description' => 'The dockerfile.',
+                    'source' => __DIR__ . '/../publish/docker/dockerfile',
+                    'destination' => BASE_PATH . '/dockerfile',
+                ],
+//                docker-compose
+                [
+                    'id' => 'docker-compose',
+                    'description' => 'The docker-compose.',
+                    'source' => __DIR__ . '/../publish/docker/docker-compose.yml',
+                    'destination' => BASE_PATH . '/docker-compose.yml',
+                ],
             ],
         ];
     }
