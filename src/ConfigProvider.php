@@ -70,8 +70,8 @@ class ConfigProvider
                 [
                     'id' => 'dockerfile',
                     'description' => 'The dockerfile.',
-                    'source' => __DIR__ . '/../publish/docker/dockerfile',
-                    'destination' => BASE_PATH . '/dockerfile',
+                    'source' => __DIR__ . '/../publish/docker/Dockerfile',
+                    'destination' => BASE_PATH . '/Dockerfile',
                 ],
 //                docker-compose
                 [
