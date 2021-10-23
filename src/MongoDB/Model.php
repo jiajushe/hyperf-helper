@@ -123,7 +123,7 @@ abstract class Model
     final public function create(array $document, int $timeout = 1000): array
     {
         $document = $this->addTime([$document]);
-        return $this->modelTask->insert($this->config, [$document], $timeout);
+        return $this->modelTask->insert($this->config, $document, $timeout);
     }
 
     /**
