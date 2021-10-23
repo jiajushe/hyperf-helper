@@ -25,13 +25,16 @@ class ModelTask
         if (isset($this->manager)) {
             return $this->manager;
         }
-        if (!$config['username']) {
-            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
-        } else {
-            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
-        }
         $this->namespace = $config['database'] . '.' . $config['collection'];
-        return $this->manager = new Manager($uri);
+        return $this->manager = new Manager($this->getUri($config));
+    }
+
+    public function client(array $config): Client
+    {
+        if (isset($this->client)) {
+            return $this->client;
+        }
+        return $this->client = new Client($this->getUri($config));
     }
 
     public function collection(array $config): Collection
@@ -39,13 +42,17 @@ class ModelTask
         if (isset($this->collection)) {
             return $this->collection;
         }
-        if (!$config['username']) {
-            $uri = 'mongodb://' . $config['host'] . ':' . $config['port'];
-        } else {
-            $uri = 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
-        }
-        $this->client = new Client($uri);
+        $this->client = new Client($this->getUri($config));
         return $this->collection = $this->client->selectCollection($config['database'], $config['collection']);
+    }
+
+    final protected function getUri(array $config): string
+    {
+        if (!$config['username']) {
+            return 'mongodb://' . $config['host'] . ':' . $config['port'];
+        } else {
+            return 'mongodb://' . $config['username'] . ':' . $config['password'] . '@' . $config['host'] . ':' . $config['port'];
+        }
     }
 
     /**
