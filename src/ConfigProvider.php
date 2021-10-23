@@ -57,7 +57,14 @@ class ConfigProvider
                     'id' => 'volumes',
                     'description' => 'The volumes.',
                     'source' => __DIR__ . '/../publish/volumes',
-                    'destination' => BASE_PATH . '/v/volumes',
+                    'destination' => BASE_PATH . '/volumes',
+                ],
+//                .gitignore
+                [
+                    'id' => 'gitignore',
+                    'description' => 'The .gitignore.',
+                    'source' => __DIR__ . '/../publish/.gitignore',
+                    'destination' => BASE_PATH . '/.gitignore',
                 ],
             ],
         ];
