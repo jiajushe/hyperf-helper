@@ -2,3 +2,8 @@
 /composer.lock
 .idea/
 .git/
+/publish/volumes/config/supervisor/mongod.conf
+/publish/volumes/config/php/php.ini
+/publish/volumes/config/mongodb/mongodb_noauth.conf
+/publish/volumes/config/mongodb/mongodb_auth.js
+/publish/volumes/config/mongodb/mongodb.conf

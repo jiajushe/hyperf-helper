@@ -52,6 +52,13 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/exceptions.php',
                     'destination' => BASE_PATH . '/config/autoload/exceptions.php',
                 ],
+//                volumes
+                [
+                    'id' => 'volumes',
+                    'description' => 'The config of jwt.',
+                    'source' => __DIR__ . '/../publish/volumes',
+                    'destination' => BASE_PATH . '/volumes',
+                ],
             ],
         ];
     }

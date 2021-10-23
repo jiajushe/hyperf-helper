@@ -1,0 +1,13 @@
+[program:mongod]
+command=mongod -f /server/config/mongodb/mongodb_noauth.conf
+directory=/
+autorestart=true
+startsecs=3
+startretries=3
+stdout_logfile=/server/data/supervisor/logs/mongod.out.log
+stderr_logfile=/server/data/supervisor/logs/mongod.err.log
+stdout_logfile_maxbytes=2MB
+stderr_logfile_maxbytes=2MB
+user=root
+priority=999
+numprocs=1
