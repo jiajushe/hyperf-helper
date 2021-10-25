@@ -26,6 +26,7 @@ class Token
     {
         try {
             $config = config('jwt');
+            pp($config);
             $time = time();
             $sub = $user->id;
             unset($user->id, $user->password);
