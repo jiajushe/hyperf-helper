@@ -33,6 +33,7 @@ class Token
                 'sub' => $sub, //用户ID
                 'exp' => $time + $config['expire_second'], //过期时间
                 'refresh' => $config['refresh_second'], //刷新时间
+                'role' => $user->role,//权限角色
                 'nbf' => $time, //某个时间点后才能访问
                 'iat' => $time, //签发时间
             ];
@@ -83,9 +84,9 @@ class Token
         if ($payload->refresh < ($payload->exp - time())) {
             return null;
         }
-        $user = $payload->info;
-        $user->id = $payload->sub;
-        $model = $payload->iss;
-        return $this->make($model,$user);
+        $user_id = $payload->sub;
+        $model = new $payload->iss ();
+        $user = $model->find($user_id);
+        return $this->make($payload->iss,$user);
     }
 }
