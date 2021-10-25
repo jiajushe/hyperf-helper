@@ -28,7 +28,6 @@ class Token
             $config = config('jwt');
             $time = time();
             $sub = $user->id;
-            unset($user->id, $user->password);
             $payload = [
                 'iss' => $model,    //签发者
                 'sub' => $sub, //用户ID
@@ -36,7 +35,6 @@ class Token
                 'refresh' => $config['refresh_second'], //刷新时间
                 'nbf' => $time, //某个时间点后才能访问
                 'iat' => $time, //签发时间
-                'info' => $user,
             ];
             return JWT::encode($payload, $config['secret']);
         } catch (Throwable $t) {
