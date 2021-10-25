@@ -28,7 +28,7 @@ class Token
             $config = config('jwt');
             $time = time();
             $sub = $user->id;
-            unset($user->id);
+            unset($user->id, $user->password);
             $payload = [
                 'iss' => $model,    //签发者
                 'sub' => $sub, //用户ID
