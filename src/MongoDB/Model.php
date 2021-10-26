@@ -307,6 +307,19 @@ abstract class Model
     }
 
     /**
+     * 判断字段是否存在
+     * @param array $field_arr  ['field' => bool]
+     * @return $this
+     */
+    final public function exists(array $field_arr): Model
+    {
+        foreach ($field_arr as $index => $item) {
+            $this->filter[$index] = ['$exists' => (bool)$item];
+        }
+        return $this;
+    }
+
+    /**
      * 排序
      * @param $field
      * @param string $opt
