@@ -96,4 +96,18 @@ class ResponseHelper
         }
         return $res;
     }
+
+    /**
+     * 表单验证错误信息返回格式
+     * @param string $msg
+     * @return string
+     * @author yun 2021-10-26 10:11:05
+     */
+    public function validation(string $msg): string
+    {
+        return Json::encode([
+            'code' => config('res_code.normal'),
+            'error_msg' => $msg,
+        ]);
+    }
 }
