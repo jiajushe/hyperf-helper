@@ -80,6 +80,20 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/docker/docker-compose.yml',
                     'destination' => BASE_PATH . '/docker-compose.yml',
                 ],
+//                README.md
+                [
+                    'id' => 'readme',
+                    'description' => 'The README.',
+                    'source' => __DIR__ . '/../publish/README.md',
+                    'destination' => BASE_PATH . '/README.md',
+                ],
+//                php-cs-fixer
+                [
+                    'id' => 'readme',
+                    'description' => 'The README.',
+                    'source' => __DIR__ . '/../publish/.php-cs-fixer.php',
+                    'destination' => BASE_PATH . '/.php-cs-fixer.php',
+                ],
             ],
         ];
     }
