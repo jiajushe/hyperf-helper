@@ -21,3 +21,4 @@ vendor/
 /config/autoload/res_code.php
 /config/autoload/jwt.php
 /config/autoload/exceptions.php
+/composer.lock
