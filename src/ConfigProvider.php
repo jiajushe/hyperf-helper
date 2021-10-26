@@ -89,10 +89,17 @@ class ConfigProvider
                 ],
 //                php-cs-fixer
                 [
-                    'id' => 'readme',
-                    'description' => 'The README.',
+                    'id' => 'php-cs-fixer',
+                    'description' => 'The php-cs-fixer.',
                     'source' => __DIR__ . '/../publish/.php-cs-fixer.php',
                     'destination' => BASE_PATH . '/.php-cs-fixer.php',
+                ],
+//                env.example
+                [
+                    'id' => 'env_example',
+                    'description' => 'The env.example.',
+                    'source' => __DIR__ . '/../publish/.env.example',
+                    'destination' => BASE_PATH . '/.env.example',
                 ],
             ],
         ];
