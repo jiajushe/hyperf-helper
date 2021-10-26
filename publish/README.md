@@ -1,3 +1,7 @@
+更新类库
+
+composer update
+
 创建数据卷目录
 
 mkdir -p /server/docker-volumes/saas-auth
@@ -40,6 +44,16 @@ cp -r ./volumes/config /server/docker-volumes/saas-auth
 cp ./.env.example ./.env
 
 **********************************************************************
+
+创建镜像
+
+docker-compose build
+
+运行镜像
+
+docker-compose up -d
+
+***********************************************************************
 
 容器内php配置文件目录
 
