@@ -3,7 +3,7 @@
     "description": "hyperf helper",
     "type": "library",
     "require": {
-        "php": ">=7.4",
+        "php": "~7.4.0",
         "ext-mongodb": "~1.10.0",
         "firebase/php-jwt": "~5.4.0",
         "hyperf/config": "~2.2.0",
