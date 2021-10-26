@@ -43,7 +43,7 @@ class ResponseHelper
         }
         return Json::encode([
             'code' => $code,
-            'error_msg' => $throwable->getMessage(),
+            'msg' => $throwable->getMessage(),
         ]);
     }
 
@@ -61,7 +61,7 @@ class ResponseHelper
         }
         return Json::encode([
             'code' => $code,
-            'error_msg' => $throwable->getMessage(),
+            'msg' => $throwable->getMessage(),
             'class_name' => get_class($throwable),
             'line' => $throwable->getLine(),
             'file' => $throwable->getFile(),
@@ -107,7 +107,7 @@ class ResponseHelper
     {
         return Json::encode([
             'code' => config('res_code.normal'),
-            'error_msg' => $msg,
+            'msg' => $msg,
         ]);
     }
 }
