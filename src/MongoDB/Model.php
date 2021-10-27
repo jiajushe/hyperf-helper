@@ -410,7 +410,7 @@ abstract class Model
      * @throws CustomError
      * @throws Exception
      */
-    final public function unique(array $filter, string $id = ''): bool
+    final public function isUnique(array $filter, string $id = ''): bool
     {
         $this->resetOptions();
         $this->resetFilter();
@@ -423,8 +423,19 @@ abstract class Model
         return (bool)$this->find($id);
     }
 
-    final public function ttttt()
+    /**
+     * 字段过滤
+     * @param array $needs 要保留的字段
+     * @param array $inputs
+     * @return array
+     */
+    final public function filterFiled(array $needs,array $inputs): array
     {
-        return $this->modelTask->collection($this->config)->getTypeMap();
+        foreach ($inputs as $index => $input) {
+            if (!in_array($index,$needs)) {
+                unset($inputs[$index]);
+            }
+        }
+        return $inputs;
     }
 }
