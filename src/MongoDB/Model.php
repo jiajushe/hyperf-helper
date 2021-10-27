@@ -111,6 +111,7 @@ abstract class Model
         if (!isset($this->collection)) {
             $this->collection = Str::snake(Str::afterLast(get_class($this), '\\'));
         }
+        pp($this->collection);
         return $this->collection;
     }
 

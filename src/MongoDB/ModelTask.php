@@ -141,6 +141,7 @@ class ModelTask
 
     /**
      * 查询
+     * @Task(timeout=30)
      * @param array $config
      * @param array $filter
      * @param array $options
