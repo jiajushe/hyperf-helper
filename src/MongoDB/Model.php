@@ -415,10 +415,10 @@ abstract class Model
         $this->resetOptions();
         $this->resetFilter();
         foreach ($filter as $f => $v) {
-            $this->filter[$f] = [self::OPERATORS['='] => $v];
+            $this->where($f, '=', $v);
         }
-        if ($id === '') {
-            return (bool)$this->find();
+        if ($id !== '') {
+            $this->where('id', '!=', $id);
         }
         return (bool)$this->find($id);
     }
