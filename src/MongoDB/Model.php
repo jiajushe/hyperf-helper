@@ -216,7 +216,7 @@ abstract class Model
     {
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
-            $this->where('id','=',$document['id']);
+            $this->where('id', '=', $document['id']);
         }
         return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
     }
@@ -309,7 +309,7 @@ abstract class Model
 
     /**
      * 判断字段是否存在
-     * @param array $field_arr  ['field' => bool]
+     * @param array $field_arr ['field' => bool]
      * @return $this
      */
     final public function exists(array $field_arr): Model
@@ -410,11 +410,13 @@ abstract class Model
      * @throws CustomError
      * @throws Exception
      */
-    final public function unique(array $filter,string $id = ''): bool
+    final public function unique(array $filter, string $id = ''): bool
     {
         $this->resetOptions();
         $this->resetFilter();
-        $this->where($filter);
+        foreach ($filter as $f => $v) {
+            $this->where($f, '=', $v);
+        }
         if ($id !== '') {
             return !(bool)$this->find();
         }
