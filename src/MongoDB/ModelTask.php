@@ -159,7 +159,6 @@ class ModelTask
                 unset($item->_id);
             });
         }
-
         return $res;
     }
 

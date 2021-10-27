@@ -178,6 +178,7 @@ abstract class Model
             $this->where('id', '=', $id);
         }
         $this->options[self::LIMIT_OPT] = 1;
+        pp($this->filter, $this->options);
         $res = $this->modelTask->query($this->config, $this->filter, $this->options);
         return $res->first();
     }
