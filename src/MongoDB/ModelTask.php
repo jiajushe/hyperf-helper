@@ -15,36 +15,25 @@ use MongoDB\Driver\WriteConcern;
 
 class ModelTask
 {
-    protected Manager $manager;
-    protected Client $client;
-    protected string $namespace;
-    protected Collection $collection;
-
     public function manager(array $config): Manager
     {
-        if (isset($this->manager)) {
-            return $this->manager;
-        }
-        $this->namespace = $config['database'] . '.' . $config['collection'];
-        pp('namespace:',$this->namespace);
-        return $this->manager = new Manager($this->getUri($config));
+        return new Manager($this->getUri($config));
+    }
+
+    public function namespace(array $config): string
+    {
+        return $config['database'] . '.' . $config['collection'];
     }
 
     public function client(array $config): Client
     {
-        if (isset($this->client)) {
-            return $this->client;
-        }
-        return $this->client = new Client($this->getUri($config));
+        return new Client($this->getUri($config));
     }
 
     public function collection(array $config): Collection
     {
-        if (isset($this->collection)) {
-            return $this->collection;
-        }
-        $this->client = new Client($this->getUri($config));
-        return $this->collection = $this->client->selectCollection($config['database'], $config['collection']);
+        $client = new Client($this->getUri($config));
+        return $client->selectCollection($config['database'], $config['collection']);
     }
 
     final protected function getUri(array $config): string
@@ -87,7 +76,7 @@ class ModelTask
         foreach ($document as $row) {
             $bulkWrite->insert($row);
         }
-        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'confirm' => $res->isAcknowledged(),
             'error' => $res->getWriteConcernError(),
@@ -109,7 +98,7 @@ class ModelTask
     {
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->update($filter, ['$set' => $document], ['multi' => true, 'upsert' => false]);
-        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'confirm' => $res->isAcknowledged(),
             'error' => $res->getWriteConcernError(),
@@ -131,7 +120,7 @@ class ModelTask
     {
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->delete($filter);
-        $res = $this->manager($config)->executeBulkWrite($this->namespace, $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'confirm' => $res->isAcknowledged(),
             'error' => $res->getWriteConcernError(),
@@ -152,7 +141,7 @@ class ModelTask
     {
         $query = new Query($filter, $options);
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
-        $res = $this->manager($config)->executeQuery($this->namespace, $query, $readPreference);
+        $res = $this->manager($config)->executeQuery($this->namespace($config), $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
         if (!isset($options['projection']['_id']) || $options['projection']['_id']) {
             $res = $res->each(function ($item) {
