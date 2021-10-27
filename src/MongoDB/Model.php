@@ -418,8 +418,8 @@ abstract class Model
             $this->filter[$f] = [self::OPERATORS['='] => $v];
         }
         if ($id === '') {
-            return !(bool)$this->find();
+            return (bool)$this->find();
         }
-        return !(bool)$this->find($id);
+        return (bool)$this->find($id);
     }
 }
