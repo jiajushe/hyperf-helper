@@ -267,10 +267,7 @@ abstract class Model
     final public function select(array $field_arr, bool $choose = true): Model
     {
         foreach ($field_arr as $field) {
-            if ($field === 'id') {
-                $field = '_id';
-            }
-            $this->options[self::PROJECTION_OPT][$field] = (int)$choose;
+            $this->options[self::PROJECTION_OPT][$this->idTo_id($field)] = (int)$choose;
         }
         return $this;
     }
@@ -314,7 +311,10 @@ abstract class Model
     final public function exists(array $field_arr): Model
     {
         foreach ($field_arr as $index => $item) {
-            $this->filter[$index] = ['$exists' => (bool)$item];
+            if ($index == 'id') {
+                $index = '_id';
+            }
+            $this->filter[$this->idTo_id($index)] = ['$exists' => (bool)$item];
         }
         return $this;
     }
@@ -331,13 +331,13 @@ abstract class Model
         if (is_array($field)) {
             foreach ($field as $key => $val) {
                 if (is_int($key)) {
-                    $this->options[self::SORT_OPT][$val] = $opt_arr['asc'];
+                    $this->options[self::SORT_OPT][$this->idTo_id($val)] = $opt_arr['asc'];
                 } else {
-                    $this->options[self::SORT_OPT][$key] = $opt_arr[$val];
+                    $this->options[self::SORT_OPT][$this->idTo_id($key)] = $opt_arr[$val];
                 }
             }
         } else {
-            $this->options[self::SORT_OPT][$field] = $opt_arr[$opt];
+            $this->options[self::SORT_OPT][$this->idTo_id($field)] = $opt_arr[$opt];
         }
         return $this;
     }
@@ -393,4 +393,11 @@ abstract class Model
         return $data;
     }
 
+    final protected function idTo_id(string $field): string
+    {
+        if ($field == 'id') {
+            $field = '_id';
+        }
+        return $field;
+    }
 }
