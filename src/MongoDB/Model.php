@@ -315,10 +315,7 @@ abstract class Model
     final public function exists(array $field_arr): Model
     {
         foreach ($field_arr as $index => $item) {
-            if ($index == 'id') {
-                $index = '_id';
-            }
-            $this->filter[$this->idTo_id($index)] = ['$exists' => (bool)$item];
+            $this->filter[$this->idTo_id($this->idTo_id($index))] = ['$exists' => $item];
         }
         return $this;
     }

@@ -26,6 +26,7 @@ class ModelTask
             return $this->manager;
         }
         $this->namespace = $config['database'] . '.' . $config['collection'];
+        pp('namespace:',$this->namespace);
         return $this->manager = new Manager($this->getUri($config));
     }
 
