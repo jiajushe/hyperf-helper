@@ -111,8 +111,6 @@ abstract class Model
         if (!isset($this->collection)) {
             $this->collection = Str::snake(Str::afterLast(get_class($this), '\\'));
         }
-        pp('**************************************');
-        pp($this->collection);
         return $this->collection;
     }
 
@@ -122,7 +120,7 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function create(array $document, int $timeout = 1000): array
+    final public function create(array $document, int $timeout = 30000): array
     {
         $document = $this->addTime([$document]);
         return $this->modelTask->insert($this->config, $document, $timeout);
@@ -134,7 +132,7 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function insert(array $document, int $timeout = 1000): array
+    final public function insert(array $document, int $timeout = 30000): array
     {
         $document = $this->addTime($document);
         return $this->modelTask->insert($this->config, $document, $timeout);
@@ -164,7 +162,6 @@ abstract class Model
      */
     final public function all(): Collection
     {
-        pp($this->filter, $this->options);
         return $this->modelTask->query($this->config, $this->filter, $this->options);
     }
 
@@ -181,7 +178,6 @@ abstract class Model
             $this->where('id', '=', $id);
         }
         $this->options[self::LIMIT_OPT] = 1;
-        pp($this->filter, $this->options);
         $res = $this->modelTask->query($this->config, $this->filter, $this->options);
         return $res->first();
     }
@@ -215,7 +211,7 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function update(array $document, int $timeout = 1000): array
+    final public function update(array $document, int $timeout = 30000): array
     {
         $document = $this->addUpdated($document);
         return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
@@ -239,7 +235,7 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function delete(string $id = null, int $timeout = 1000): array
+    final public function delete(string $id = null, int $timeout = 30000): array
     {
         if ($id) {
             $this->where('id', '=', $id);
