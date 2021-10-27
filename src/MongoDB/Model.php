@@ -111,7 +111,7 @@ abstract class Model
         if (!isset($this->collection)) {
             $this->collection = Str::snake(Str::afterLast(get_class($this), '\\'));
         }
-//        pp($this->collection);
+        pp($this->collection);
         return $this->collection;
     }
 
@@ -163,6 +163,7 @@ abstract class Model
      */
     final public function all(): Collection
     {
+        pp($this->filter, $this->options);
         return $this->modelTask->query($this->config, $this->filter, $this->options);
     }
 
