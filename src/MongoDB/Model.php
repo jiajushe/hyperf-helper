@@ -422,4 +422,9 @@ abstract class Model
         }
         return (bool)$this->find($id);
     }
+
+    final public function ttttt()
+    {
+        return $this->modelTask->collection($this->config)->getTypeMap();
+    }
 }
