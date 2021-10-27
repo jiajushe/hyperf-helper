@@ -263,6 +263,16 @@ abstract class Model
     }
 
     /**
+     * @param int $num
+     * @return $this
+     */
+    final public function limit(int $num): Model
+    {
+        $this->options[self::LIMIT_OPT] = $num;
+        return $this;
+    }
+
+    /**
      * 筛选字段
      * @param array $field_arr 字段数组
      * @param bool $choose 是否选择
@@ -354,16 +364,6 @@ abstract class Model
     }
 
     /**
-     * @param int $num
-     * @return $this
-     */
-    final public function limit(int $num): Model
-    {
-        $this->options[self::LIMIT_OPT] = $num;
-        return $this;
-    }
-
-    /**
      * @return array
      */
     final public function getFilter(): array
@@ -415,9 +415,9 @@ abstract class Model
         $this->resetOptions();
         $this->resetFilter();
         foreach ($filter as $f => $v) {
-            $this->where($f, '=', $v);
+            $this->filter[$f] = [self::OPERATORS['='] => $v];
         }
-        if ($id !== '') {
+        if ($id === '') {
             return !(bool)$this->find();
         }
         return !(bool)$this->find($id);
