@@ -420,9 +420,7 @@ abstract class Model
         if ($id !== '') {
             $this->where('id', '!=', $id);
         }
-        $t = $this->find($id);
-        pp($this->getFilter(),$t);
-        return (bool)$t;
+        return (bool)$this->find();
     }
 
     /**
