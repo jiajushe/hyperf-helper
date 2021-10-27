@@ -401,4 +401,23 @@ abstract class Model
         }
         return $field;
     }
+
+    /**
+     *  判断值是否唯一
+     * @param array $filter
+     * @param string $id
+     * @return bool true=>已存在，false=>不存在
+     * @throws CustomError
+     * @throws Exception
+     */
+    final public function unique(array $filter,string $id = ''): bool
+    {
+        $this->resetOptions();
+        $this->resetFilter();
+        $this->where($filter);
+        if ($id !== '') {
+            return !(bool)$this->find();
+        }
+        return !(bool)$this->find($id);
+    }
 }
