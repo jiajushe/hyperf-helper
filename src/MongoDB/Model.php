@@ -210,10 +210,14 @@ abstract class Model
      * @param array $document
      * @param int $timeout
      * @return array
+     * @throws CustomError
      */
     final public function update(array $document, int $timeout = 30000): array
     {
         $document = $this->addUpdated($document);
+        if (isset($document['id'])) {
+            $this->where('id','=',$document['id']);
+        }
         return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
     }
 
