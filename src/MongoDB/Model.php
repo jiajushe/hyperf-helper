@@ -288,6 +288,10 @@ abstract class Model
     }
 
     /**
+     * @param mixed $field
+     * @param string $operator
+     * @param mixed $value
+     * @return Model
      * @throws CustomError
      */
     final public function where($field, string $operator = '', $value = ''): Model
@@ -303,17 +307,43 @@ abstract class Model
             $value = new ObjectId($value);
         }
         if (!empty(self::OPERATORS[$operator])) {
-            if ($operator == 'between') {
+            if ($operator === 'between') {
                 if (!is_array($value)) {
                     throw new CustomError('$value must be array');
                 }
                 $this->filter['$and'][][$field] = [self::OPERATORS['between'][0] => $value[0], self::OPERATORS['between'][1] => $value[1]];
                 return $this;
             }
-            if ($operator == 'in' && !is_array($value)) {
+            if ($operator === 'in' && !is_array($value)) {
                 throw new CustomError('$value must be array');
             }
             $this->filter['$and'][][$field] = [self::OPERATORS[$operator] => $value];
+        }
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param array $conditions
+     * @return Model
+     * @throws CustomError
+     */
+    final public function whereOr(string $field, array $conditions): Model
+    {
+        if ($field === 'id') {
+            throw new CustomError('Please use "in" instead of "or"');
+        }
+        foreach ($conditions as $operator => $value) {
+            if ($operator === 'between') {
+                if (!is_array($value)) {
+                    throw new CustomError('$value must be array');
+                }
+                $this->filter['$and'][$field]['$or'][] = [self::OPERATORS['between'][0] => $value[0], self::OPERATORS['between'][1] => $value[1]];
+            }
+            if ($operator === 'in' && !is_array($value)) {
+                throw new CustomError('$value must be array');
+            }
+            $this->filter['$and'][$field]['$or'][] = [self::OPERATORS[$operator] => $value];
         }
         return $this;
     }
@@ -333,7 +363,7 @@ abstract class Model
 
     /**
      * 排序
-     * @param $field
+     * @param mixed $field
      * @param string $opt
      * @return $this
      */
