@@ -163,7 +163,7 @@ abstract class Model
      */
     final public function all(): Collection
     {
-        return $this->modelTask->query($this->config, $this->filter, $this->options);
+        return $this->modelTask->query($this->config, $this->getFilter(), $this->options);
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class Model
             $this->where('id', '=', $id);
         }
         $this->options[self::LIMIT_OPT] = 1;
-        $res = $this->modelTask->query($this->config, $this->filter, $this->options);
+        $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
         return $res->first();
     }
 
@@ -219,7 +219,7 @@ abstract class Model
         if (isset($document['id'])) {
             $this->where('id', '=', $document['id']);
         }
-        return $this->modelTask->update($this->config, $this->filter, $document, $timeout);
+        return $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
     }
 
     final protected function addUpdated(array $document): array
@@ -245,7 +245,7 @@ abstract class Model
         if ($id) {
             $this->where('id', '=', $id);
         }
-        return $this->modelTask->delete($this->config, $this->filter, $timeout);
+        return $this->modelTask->delete($this->config, $this->getFilter(), $timeout);
     }
 
     /**
@@ -260,7 +260,7 @@ abstract class Model
         if (!$this->options[self::SKIP_OPT]) {
             unset($this->options[self::SKIP_OPT]);
         }
-        return $this->modelTask->count($this->config, $this->filter, $this->options);
+        return $this->modelTask->count($this->config, $this->getFilter(), $this->options);
     }
 
     /**
@@ -369,7 +369,11 @@ abstract class Model
      */
     final public function getFilter(): array
     {
-        return $this->filter;
+        $filter = $this->filter;
+        if (empty($filter['$and'])) {
+            $filter = [];
+        }
+        return $filter;
     }
 
     /**
