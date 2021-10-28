@@ -75,6 +75,7 @@ abstract class Model
         $config['collection'] = $this->getCollection();
         $this->config = $config;
         $this->resetOptions();
+        $this->resetFilter();
     }
 
     /**
@@ -98,7 +99,7 @@ abstract class Model
      */
     final public function resetFilter(): Model
     {
-        $this->filter = [];
+        $this->filter = ['$and' => []];
         return $this;
     }
 
@@ -306,13 +307,13 @@ abstract class Model
                 if (!is_array($value)) {
                     throw new CustomError('$value must be array');
                 }
-                $this->filter[$field] = [self::OPERATORS[0] => $value[0], self::OPERATORS[1] => $value[1]];
+                $this->filter['$and'][$field] = [self::OPERATORS['between'][0] => $value[0], self::OPERATORS['between'][1] => $value[1]];
                 return $this;
             }
             if ($operator == 'in' && !is_array($value)) {
                 throw new CustomError('$value must be array');
             }
-            $this->filter[$field] = [self::OPERATORS[$operator] => $value];
+            $this->filter['$and'][$field] = [self::OPERATORS[$operator] => $value];
         }
         return $this;
     }
@@ -325,7 +326,7 @@ abstract class Model
     final public function exists(array $field_arr): Model
     {
         foreach ($field_arr as $index => $item) {
-            $this->filter[$this->idTo_id($this->idTo_id($index))] = ['$exists' => $item];
+            $this->filter['$and'][$this->idTo_id($this->idTo_id($index))] = ['$exists' => $item];
         }
         return $this;
     }
