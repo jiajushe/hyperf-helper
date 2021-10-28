@@ -349,6 +349,16 @@ abstract class Model
     }
 
     /**
+     * @param array $filter
+     * @return Model
+     */
+    final public function whereRaw(array $filter): Model
+    {
+        $this->filter['$and'][] = $filter;
+        return $this;
+    }
+
+    /**
      * 判断字段是否存在
      * @param array $field_arr ['field' => bool]
      * @return $this
