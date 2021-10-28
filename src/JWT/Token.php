@@ -33,10 +33,15 @@ class Token
                 'sub' => $sub, //用户ID
                 'exp' => $time + $config['expire_second'], //过期时间
                 'refresh' => $config['refresh_second'], //刷新时间
-                'role' => $user->role,//权限角色
                 'nbf' => $time, //某个时间点后才能访问
                 'iat' => $time, //签发时间
             ];
+            if (isset($user->pid)) {
+                $payload['pid']=$user->pid;
+            }
+            if (isset($user->role)) {
+                $payload['role']=$user->role;
+            }
             return JWT::encode($payload, $config['secret']);
         } catch (Throwable $t) {
             throw new CustomError($t->getMessage());
