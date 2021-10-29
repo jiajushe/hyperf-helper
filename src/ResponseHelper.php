@@ -106,7 +106,7 @@ class ResponseHelper
     public function validation(string $msg): string
     {
         return Json::encode([
-            'code' => config('res_code.normal'),
+            'code' => config('res_code.alert'),
             'msg' => $msg,
         ]);
     }
