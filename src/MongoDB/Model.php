@@ -483,4 +483,42 @@ abstract class Model
         }
         return $inputs;
     }
+
+    public function __call($name, $arguments)
+    {
+        return '';
+    }
+
+    /**
+     * 追加字段.
+     */
+    final public function append(object $data, array $field): object
+    {
+        $changed = [];
+        foreach ($field as $item) {
+            $changed[$item] = 'get' . Str::ucfirst(Str::camel($item)) . 'Attr';
+        }
+        if ($data instanceof Collection) {
+            $data->each(function ($item) use ($field) {
+                return $this->append($item, $field);
+            });
+        } else {
+            foreach ($changed as $index => $item) {
+                if (in_array($index, [$this->created_at, $this->updated_at])) {
+                    if (! empty($data->{$index})) {
+                        $data->{$index} = $this->getDateStr($data->{$index});
+                    }
+                } else {
+                    $data->{$index} = $this->{$item}($data);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    final public function getDateStr(int $timestamp)
+    {
+        return date('Y-m-d H:i:s', $timestamp);
+    }
 }
