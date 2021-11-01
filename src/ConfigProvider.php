@@ -101,6 +101,13 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/.env.example',
                     'destination' => BASE_PATH . '/.env.example',
                 ],
+//                JsonRPC配置
+                [
+                    'id' => 'services',
+                    'description' => 'The services.',
+                    'source' => __DIR__ . '/../publish/services.php',
+                    'destination' => BASE_PATH . '/config/autoload/services.php',
+                ],
             ],
         ];
     }
