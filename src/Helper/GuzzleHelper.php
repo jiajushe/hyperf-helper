@@ -13,6 +13,7 @@ namespace Jiajushe\HyperfHelper\Helper;
 
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Guzzle\ClientFactory;
+use Hyperf\Utils\Codec\Json;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
@@ -25,6 +26,7 @@ class GuzzleHelper
     protected ClientFactory $clientFactory;
 
     /**
+     * 发送请求
      * @param string $method 请求方法
      * @param string $uri 请求地址
      * @param array $query 请求参数
@@ -47,9 +49,14 @@ class GuzzleHelper
         }
     }
 
-    public function toArray(ResponseInterface $response)
+    /**
+     * 获取返回信息
+     * @param ResponseInterface $response
+     * @return mixed
+     */
+    public function getResponse(ResponseInterface $response)
     {
-
+        return Json::decode($response->getBody()->getContents());
     }
 
     /**
