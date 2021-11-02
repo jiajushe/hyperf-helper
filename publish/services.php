@@ -10,7 +10,6 @@ declare(strict_types=1);
  * @license
  */
 return [
-    // 此处省略了其它同层级的配置
     'consumers' => [
         [
             // name 需与服务提供者的 name 属性相同
