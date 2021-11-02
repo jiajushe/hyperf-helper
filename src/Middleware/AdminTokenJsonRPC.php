@@ -25,7 +25,7 @@ class AdminTokenJsonRPC implements MiddlewareInterface
     /**
      * @Inject
      */
-    protected AdminTokenJsonRPC $adminTokenJsonRPC;
+    protected AdminTokenJsonRPCInterface $adminTokenJsonRPC;
 
     public function __construct(ContainerInterface $container)
     {
