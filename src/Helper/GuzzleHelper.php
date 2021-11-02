@@ -29,26 +29,21 @@ class GuzzleHelper
      * @param string $uri 请求地址
      * @param array $query 请求参数
      * @param array $options 请求选项
-     * @param int $concurrent 最大同时运行的协程数
      * @throws CustomError
      */
-    public function request(string $method, string $uri, array $query, array $options = [], int $concurrent = 0): ResponseInterface
+    public function request(string $method, string $uri, array $query, array $options = []): ResponseInterface
     {
         $options['query'] = $query;
-        $res = parallel([
-            function () use ($method, $uri, $options) {
-                try {
-                    return $this->clientFactory->create()->request($method, $uri, $options);
-                } catch (Throwable $t) {
-                    $this->errorLog($t, [$method, $uri, $options]);
-                    return null;
-                }
-            },
-        ], $concurrent);
-        if ($res[0] === null) {
+        try {
+            $res = $this->clientFactory->create()->request($method, $uri, $options);
+            if ($res->getStatusCode() != 200) {
+                throw new CustomError('weixin connect error');
+            }
+            return $res;
+        } catch (Throwable $t) {
+            $this->errorLog($t, [$method, $uri, $options]);
             throw new CustomError('weixin connect error');
         }
-        return $res[0];
     }
 
     /**
