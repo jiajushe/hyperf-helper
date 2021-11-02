@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Jiajushe\HyperfHelper;
+namespace Jiajushe\HyperfHelper\Helper;
 
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Contract\RequestInterface;
