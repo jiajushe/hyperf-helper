@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiajushe\HyperfHelper;
+namespace Jiajushe\HyperfHelper\Helper;
 
 use Hyperf\Utils\Codec\Json;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;

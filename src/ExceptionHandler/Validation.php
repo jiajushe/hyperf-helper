@@ -5,7 +5,7 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Validation\ValidationException;
-use Jiajushe\HyperfHelper\ResponseHelper;
+use Jiajushe\HyperfHelper\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
