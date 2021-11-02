@@ -29,21 +29,27 @@ class GuzzleHelper
      * @param string $uri 请求地址
      * @param array $query 请求参数
      * @param array $options 请求选项
+     * @return ResponseInterface
      * @throws CustomError
      */
     public function request(string $method, string $uri, array $query, array $options = []): ResponseInterface
     {
         $options['query'] = $query;
         try {
-            $res = $this->clientFactory->create()->request($method, $uri, $options);
-            if ($res->getStatusCode() != 200) {
+            $response = $this->clientFactory->create()->request($method, $uri, $options);
+            if ($response->getStatusCode() != 200) {
                 throw new CustomError('weixin connect error');
             }
-            return $res;
+            return $response;
         } catch (Throwable $t) {
             $this->errorLog($t, [$method, $uri, $options]);
             throw new CustomError('weixin connect error');
         }
+    }
+
+    public function toArray(ResponseInterface $response)
+    {
+
     }
 
     /**
