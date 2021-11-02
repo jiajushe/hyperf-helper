@@ -6,6 +6,7 @@ namespace Jiajushe\HyperfHelper;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
+use Jiajushe\HyperfHelper\Helper\ResponseHelper;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -16,25 +17,21 @@ abstract class BaseController
 {
     /**
      * @Inject
-     * @var ContainerInterface
      */
-    protected $container;
+    protected ContainerInterface $container;
 
     /**
      * @Inject
-     * @var RequestInterface
      */
-    protected $request;
+    protected RequestInterface $request;
 
     /**
      * @Inject
-     * @var ResponseInterface
      */
     protected ResponseInterface $response;
 
     /**
      * @Inject()
-     * @var ResponseHelper
      */
     protected ResponseHelper $responseHelper;
 
