@@ -15,7 +15,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * 公用 Admin token 验证中间件.
  */
-class AdminTokenJsonRPCMiddleware implements MiddlewareInterface
+class AdminTokenJsonRPC implements MiddlewareInterface
 {
     /**
      * @var ContainerInterface
@@ -25,7 +25,7 @@ class AdminTokenJsonRPCMiddleware implements MiddlewareInterface
     /**
      * @Inject
      */
-    protected AdminTokenJsonRPCInterface $adminTokenJsonRPC;
+    protected AdminTokenJsonRPC $adminTokenJsonRPC;
 
     public function __construct(ContainerInterface $container)
     {
@@ -56,7 +56,7 @@ class AdminTokenJsonRPCMiddleware implements MiddlewareInterface
             case config('res_code.token'):
                 throw new CustomNormal($res['msg'], $res['code']);
             default:
-                throw new CustomError('AdminTokenJsonRPC error');
+                throw new CustomError('AdminTokenJsonRPCInterface error');
         }
         $response = $handler->handle($request);
         //刷新token
