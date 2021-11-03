@@ -57,8 +57,8 @@ abstract class Model
     protected const SKIP_OPT = 'skip';
     protected const SORT_OPT = 'sort';
 
-    protected string $created_at = 'created_at';
-    protected string $updated_at = 'updated_at';
+    public string $created_at = 'created_at';
+    public string $updated_at = 'updated_at';
 
     /**
      * @var array   查询选项
