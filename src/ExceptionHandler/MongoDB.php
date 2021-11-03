@@ -35,7 +35,6 @@ class MongoDB  extends ExceptionHandler
 
     public function isValid(Throwable $throwable): bool
     {
-
         return Str::contains(get_class($throwable), 'MongoDB\Driver\Exception');
     }
 }
