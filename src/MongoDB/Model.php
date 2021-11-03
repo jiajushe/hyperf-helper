@@ -200,7 +200,7 @@ abstract class Model
         return [
             'total' => $total,
             'total_page' => $total_page,
-            'current_page' => $page > $total_page ? $total_page + 1 : $page,
+            'page' => $page > $total_page ? $total_page + 1 : $page,
             'limit' => $limit,
             'data' => $data
         ];
