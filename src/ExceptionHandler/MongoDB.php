@@ -7,7 +7,7 @@ use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Helper\ResponseHelper;
-use MongoDB\Exception\InvalidArgumentException;
+use MongoDB\Driver\Exception\InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -22,6 +22,9 @@ class MongoDB  extends ExceptionHandler
     {
 //        todo  错误记录
         pp('MongoDB EXCEPTION');
+        if ($throwable instanceof InvalidArgumentException) {
+            $throwable = new CustomError('id format error');
+        }
         $res = (new ResponseHelper())->error($throwable);
         $this->stopPropagation();
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
@@ -32,9 +35,7 @@ class MongoDB  extends ExceptionHandler
 
     public function isValid(Throwable $throwable): bool
     {
-        if ($throwable instanceof InvalidArgumentException) {
-            throw new CustomError('id format error');
-        }
+
         return Str::contains(get_class($throwable), 'MongoDB\Driver\Exception');
     }
 }
