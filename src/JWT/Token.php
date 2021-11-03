@@ -39,9 +39,6 @@ class Token
             if (isset($user->pid)) {
                 $payload['pid']=$user->pid;
             }
-            if (isset($user->role)) {
-                $payload['role']=$user->role;
-            }
             return JWT::encode($payload, $config['secret']);
         } catch (Throwable $t) {
             throw new CustomError($t->getMessage());
