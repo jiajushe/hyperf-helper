@@ -201,7 +201,7 @@ abstract class Model
             'total' => $total,
             'total_page' => $total_page,
             'current_page' => $page > $total_page ? $total_page + 1 : $page,
-            'pre_page' => $limit,
+            'limit' => $limit,
             'data' => $data
         ];
     }
