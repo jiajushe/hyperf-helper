@@ -218,6 +218,7 @@ abstract class Model
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
             $this->where('id', '=', $document['id']);
+            unset($document['id']);
         }
         return $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
     }
