@@ -11,7 +11,6 @@ use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\Exception\Exception;
-use MongoDB\Exception\InvalidArgumentException;
 
 abstract class Model
 {
@@ -306,11 +305,7 @@ abstract class Model
         }
         if ($field === 'id') {
             $field = '_id';
-            try {
-                $value = new ObjectId($value);
-            } catch (InvalidArgumentException $t) {
-                throw new CustomError('id format error');
-            }
+            $value = new ObjectId($value);
         }
         if (!empty(self::OPERATORS[$operator])) {
             if ($operator === 'between') {

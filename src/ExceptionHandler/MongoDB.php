@@ -5,7 +5,9 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\Utils\Str;
+use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Helper\ResponseHelper;
+use MongoDB\Exception\InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -30,6 +32,9 @@ class MongoDB  extends ExceptionHandler
 
     public function isValid(Throwable $throwable): bool
     {
+        if ($throwable instanceof InvalidArgumentException) {
+            throw new CustomError('id format error');
+        }
         return Str::contains(get_class($throwable), 'MongoDB\Driver\Exception');
     }
 }
