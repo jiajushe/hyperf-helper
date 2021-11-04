@@ -32,34 +32,34 @@ class ResponseHelper
     /**
      * 系统错误返回格式
      * @param Throwable $throwable
-     * @return string
+     * @return array
      * @author yun 2021-10-11 17:27:52
      */
-    public function errorJson(Throwable $throwable): string
+    public function errorArray(Throwable $throwable): array
     {
         $code = $throwable->getCode();
         if ($code == 0) {
             $code = config('res_code.error');
         }
-        return Json::encode([
+        return [
             'code' => $code,
             'msg' => $throwable->getMessage(),
-        ]);
+        ];
     }
 
     /**
      * 开发环境系统错误返回格式
      * @param Throwable $throwable
-     * @return string
+     * @return array
      * @author yun 2021-10-12 11:13:53
      */
-    public function devErrorJson(Throwable $throwable): string
+    public function devErrorArray(Throwable $throwable): array
     {
         $code = $throwable->getCode();
         if ($code == 0) {
             $code = config('res_code.error');
         }
-        return Json::encode([
+        return [
             'code' => $code,
             'msg' => $throwable->getMessage(),
             'class_name' => get_class($throwable),
@@ -67,7 +67,7 @@ class ResponseHelper
             'file' => $throwable->getFile(),
             'previous' => $throwable->getPrevious(),
             'trace' => $throwable->getTrace()
-        ]);
+        ];
     }
 
     /**
@@ -84,15 +84,15 @@ class ResponseHelper
     /**
      * 返回错误数据格式
      * @param Throwable $throwable
-     * @return string
+     * @return array
      * @author yun 2021-10-12 14:02:53
      */
-    public function error(Throwable $throwable): string
+    public function error(Throwable $throwable): array
     {
         if ($this->isDev() && !($throwable instanceof CustomNormal)) {
-            $res = $this->devErrorJson($throwable);
+            $res = $this->devErrorArray($throwable);
         } else {
-            $res = $this->errorJson($throwable);
+            $res = $this->errorArray($throwable);
         }
         return $res;
     }
@@ -100,14 +100,14 @@ class ResponseHelper
     /**
      * 表单验证错误信息返回格式
      * @param string $msg
-     * @return string
+     * @return array
      * @author yun 2021-10-26 10:11:05
      */
-    public function validation(string $msg): string
+    public function validation(string $msg): array
     {
-        return Json::encode([
+        return [
             'code' => config('res_code.alert'),
             'msg' => $msg,
-        ]);
+        ];
     }
 }

@@ -4,6 +4,7 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
+use Hyperf\Utils\Codec\Json;
 use Jiajushe\HyperfHelper\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
@@ -26,7 +27,7 @@ class Custom extends ExceptionHandler
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
             ->withStatus($http_code)
             ->withAddedHeader('content-type', 'application/json; charset=utf-8')
-            ->withBody(new SwooleStream($res));
+            ->withBody(new SwooleStream(Json::encode($res)));
     }
 
     public function isValid(Throwable $throwable): bool

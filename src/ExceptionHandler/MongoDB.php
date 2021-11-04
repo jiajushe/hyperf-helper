@@ -4,6 +4,7 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
+use Hyperf\Utils\Codec\Json;
 use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Helper\ResponseHelper;
@@ -30,7 +31,7 @@ class MongoDB  extends ExceptionHandler
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
             ->withStatus(config('res_code.http.system_error'))
             ->withAddedHeader('content-type', 'application/json; charset=utf-8')
-            ->withBody(new SwooleStream($res));
+            ->withBody(new SwooleStream(Json::encode($res)));
     }
 
     public function isValid(Throwable $throwable): bool

@@ -4,6 +4,7 @@ namespace Jiajushe\HyperfHelper\ExceptionHandler;
 
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Stream\SwooleStream;
+use Hyperf\Utils\Codec\Json;
 use Hyperf\Validation\ValidationException;
 use Jiajushe\HyperfHelper\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface;
@@ -26,7 +27,7 @@ class Validation extends ExceptionHandler
         return $response->withHeader(config('res_code.header_name'), config('res_code.header_value'))
             ->withStatus(config('res_code.http.normal'))
             ->withAddedHeader('content-type', 'application/json; charset=utf-8')
-            ->withBody(new SwooleStream((new ResponseHelper())->validation($body)));
+            ->withBody(new SwooleStream(Json::encode((new ResponseHelper())->validation($body))));
     }
 
     public function isValid(Throwable $throwable): bool
