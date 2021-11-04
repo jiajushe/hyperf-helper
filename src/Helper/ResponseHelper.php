@@ -7,7 +7,7 @@ use Jiajushe\HyperfHelper\Exception\CustomNormal;
 use Throwable;
 
 /**
- * api返回信息处理类
+ * 返回信息处理类
  * @author yun 2021-10-18 23:46:30
  */
 class ResponseHelper
@@ -38,7 +38,7 @@ class ResponseHelper
     public function errorArray(Throwable $throwable): array
     {
         $code = $throwable->getCode();
-        if ($code == 0) {
+        if ($code == config('res_code.normal')) {
             $code = config('res_code.error');
         }
         return [
@@ -56,7 +56,7 @@ class ResponseHelper
     public function devErrorArray(Throwable $throwable): array
     {
         $code = $throwable->getCode();
-        if ($code == 0) {
+        if ($code == config('res_code.normal')) {
             $code = config('res_code.error');
         }
         return [
