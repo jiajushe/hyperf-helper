@@ -324,28 +324,30 @@ abstract class Model
     }
 
     /**
-     * @param string $field
-     * @param array $conditions
+     * @param array $conditions [field, operator, value]]
      * @return Model
      * @throws CustomError
      */
-    final public function whereOr(string $field, array $conditions): Model
+    final public function whereOr(array $conditions): Model
     {
-        if ($field === 'id') {
-            throw new CustomError('Please use "in" instead of "or"');
-        }
-        foreach ($conditions as $operator => $value) {
-            if ($operator === 'between') {
-                if (!is_array($value)) {
+        $filter = [];
+        foreach ($conditions as $condition) {
+            if ($condition[0] === 'id') {
+                $condition[0] = '_id';
+                $condition[2] = new ObjectId($condition[2]);
+            }
+            if ($condition[1] === 'between') {
+                if (!is_array($condition[2])) {
                     throw new CustomError('$value must be array');
                 }
-                $this->filter['$and'][$field]['$or'][] = [self::OPERATORS['between'][0] => $value[0], self::OPERATORS['between'][1] => $value[1]];
+                $filter['$or'][][$condition[0]] = [self::OPERATORS['between'][0] => $condition[2][0], self::OPERATORS['between'][1] => $condition[2][1]];
             }
-            if ($operator === 'in' && !is_array($value)) {
+            if ($condition[1]  === 'in' && !is_array($condition[2])) {
                 throw new CustomError('$value must be array');
             }
-            $this->filter['$and'][$field]['$or'][] = [self::OPERATORS[$operator] => $value];
+            $filter['$or'][][$condition[0]] = [self::OPERATORS[$condition[1]] => $condition[2]];
         }
+        $this->filter['$and'][] = $filter;
         return $this;
     }
 
@@ -356,6 +358,17 @@ abstract class Model
     final public function whereRaw(array $filter): Model
     {
         $this->filter['$and'][] = $filter;
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param array $value
+     * @return Model
+     */
+    final public function arrayWhereAll(string $field,array $value): Model
+    {
+        $this->filter['$and'][][$field] = ['$all' => $value];
         return $this;
     }
 
