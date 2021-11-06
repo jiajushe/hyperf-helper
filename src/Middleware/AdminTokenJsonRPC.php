@@ -53,6 +53,7 @@ class AdminTokenJsonRPC implements MiddlewareInterface
                     return $request;
                 });
                 break;
+            case config('res_code.alert'):
             case config('res_code.token'):
                 throw new CustomNormal($res['msg'], $res['code']);
             default:
