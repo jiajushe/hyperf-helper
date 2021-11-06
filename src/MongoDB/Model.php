@@ -44,7 +44,13 @@ abstract class Model
         '<' => '$lt',
         '<=' => '$lte',
         'in' => '$in',
+        'not_in' => '$nin',
+        'all' => '$all',
+        'not' => '$not',
         'between' => ['$gte', '$lte'],
+        'like' => 'xsi',  //不分大小写匹配所有
+        'like_before' => 'xsi', //不分大小写匹配开头
+        'like_after' => 'xsi', //不分大小写匹配结尾
     ];
 
     /**
@@ -315,7 +321,19 @@ abstract class Model
                 $this->filter['$and'][][$field] = [self::OPERATORS['between'][0] => $value[0], self::OPERATORS['between'][1] => $value[1]];
                 return $this;
             }
-            if ($operator === 'in' && !is_array($value)) {
+            if ($operator === 'like') {
+                $this->filter['$and'][][$field] = ['$regex' => $value, '$options' => self::OPERATORS[$operator]];
+                return $this;
+            }
+            if ($operator === 'like_before') {
+                $this->filter['$and'][][$field] = ['$regex' => '^' . $value, '$options' => self::OPERATORS[$operator]];
+                return $this;
+            }
+            if ($operator === 'like_after') {
+                $this->filter['$and'][][$field] = ['$regex' => $value . '$', '$options' => self::OPERATORS[$operator]];
+                return $this;
+            }
+            if (in_array($operator, ['in', 'not_in', 'all']) && !is_array($value)) {
                 throw new CustomError('$value must be array');
             }
             $this->filter['$and'][][$field] = [self::OPERATORS[$operator] => $value];
@@ -324,7 +342,7 @@ abstract class Model
     }
 
     /**
-     * @param array $conditions [field, operator, value]]
+     * @param array $conditions [ [field, operator, value], ...]
      * @return Model
      * @throws CustomError
      */
@@ -341,11 +359,65 @@ abstract class Model
                     throw new CustomError('$value must be array');
                 }
                 $filter['$or'][][$condition[0]] = [self::OPERATORS['between'][0] => $condition[2][0], self::OPERATORS['between'][1] => $condition[2][1]];
+                continue;
             }
-            if ($condition[1]  === 'in' && !is_array($condition[2])) {
+            if ($condition[1] === 'like') {
+                $filter['$or'][][$condition[0]] = ['$regex' => $condition[2], '$options' => self::OPERATORS[$condition[1]]];
+                continue;
+            }
+            if ($condition[1] === 'like_before') {
+                $filter['$or'][][$condition[0]] = ['$regex' => '^' . $condition[2], '$options' => self::OPERATORS[$condition[1]]];
+                continue;
+            }
+            if ($condition[1] === 'like_after') {
+                $filter['$or'][][$condition[0]] = ['$regex' => $condition[2] . '$', '$options' => self::OPERATORS[$condition[1]]];
+                continue;
+            }
+            if (in_array($condition[1], ['in', 'not_in', 'all']) && !is_array($condition[2])) {
                 throw new CustomError('$value must be array');
             }
             $filter['$or'][][$condition[0]] = [self::OPERATORS[$condition[1]] => $condition[2]];
+        }
+        $this->filter['$and'][] = $filter;
+        return $this;
+    }
+
+    /**
+     * @param array $conditions [ [field, operator, value], ...]
+     * @return Model
+     * @throws CustomError
+     */
+    final public function whereNotOr(array $conditions): Model
+    {
+        $filter = [];
+        foreach ($conditions as $condition) {
+            if ($condition[0] === 'id') {
+                $condition[0] = '_id';
+                $condition[2] = new ObjectId($condition[2]);
+            }
+            if ($condition[1] === 'between') {
+                if (!is_array($condition[2])) {
+                    throw new CustomError('$value must be array');
+                }
+                $filter['$nor'][][$condition[0]] = [self::OPERATORS['between'][0] => $condition[2][0], self::OPERATORS['between'][1] => $condition[2][1]];
+                continue;
+            }
+            if ($condition[1] === 'like') {
+                $filter['$nor'][][$condition[0]] = ['$regex' => $condition[2], '$options' => self::OPERATORS[$condition[1]]];
+                continue;
+            }
+            if ($condition[1] === 'like_before') {
+                $filter['$nor'][][$condition[0]] = ['$regex' => '^' . $condition[2], '$options' => self::OPERATORS[$condition[1]]];
+                continue;
+            }
+            if ($condition[1] === 'like_after') {
+                $filter['$nor'][][$condition[0]] = ['$regex' => $condition[2] . '$', '$options' => self::OPERATORS[$condition[1]]];
+                continue;
+            }
+            if (in_array($condition[1], ['in', 'not_in', 'all']) && !is_array($condition[2])) {
+                throw new CustomError('$value must be array');
+            }
+            $filter['$nor'][][$condition[0]] = [self::OPERATORS[$condition[1]] => $condition[2]];
         }
         $this->filter['$and'][] = $filter;
         return $this;
@@ -358,17 +430,6 @@ abstract class Model
     final public function whereRaw(array $filter): Model
     {
         $this->filter['$and'][] = $filter;
-        return $this;
-    }
-
-    /**
-     * @param string $field
-     * @param array $value
-     * @return Model
-     */
-    final public function arrayWhereAll(string $field,array $value): Model
-    {
-        $this->filter['$and'][][$field] = ['$all' => $value];
         return $this;
     }
 
@@ -488,10 +549,10 @@ abstract class Model
      * @param array $inputs
      * @return array
      */
-    final public function filterFiled(array $needs,array $inputs): array
+    final public function filterFiled(array $needs, array $inputs): array
     {
         foreach ($inputs as $index => $input) {
-            if (!in_array($index,$needs)) {
+            if (!in_array($index, $needs)) {
                 unset($inputs[$index]);
             }
         }
@@ -519,7 +580,7 @@ abstract class Model
         } else {
             foreach ($changed as $index => $item) {
                 if (in_array($index, [$this->created_at, $this->updated_at])) {
-                    if (! empty($data->{$index})) {
+                    if (!empty($data->{$index})) {
                         $data->{$index} = $this->getDateStr($data->{$index});
                     }
                 } else {
