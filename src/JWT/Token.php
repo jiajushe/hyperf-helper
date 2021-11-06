@@ -37,7 +37,10 @@ class Token
                 'iat' => $time, //签发时间
             ];
             if (isset($user->pid)) {
-                $payload['pid']=$user->pid;
+                $payload['pid'] = $user->pid;
+            }
+            if (isset($user->grade_name)) {
+                $payload['grade-name'] = $user->grade_name;
             }
             return JWT::encode($payload, $config['secret']);
         } catch (Throwable $t) {
@@ -89,6 +92,6 @@ class Token
         $user_id = $payload->sub;
         $model = new $payload->iss ();
         $user = $model->find($user_id);
-        return $this->make($payload->iss,$user);
+        return $this->make($payload->iss, $user);
     }
 }
