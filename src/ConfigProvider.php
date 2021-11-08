@@ -108,6 +108,13 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/services.php',
                     'destination' => BASE_PATH . '/config/autoload/services.php',
                 ],
+//                storage
+                [
+                    'id' => 'storage',
+                    'description' => 'The storage.',
+                    'source' => __DIR__ . '/../storage',
+                    'destination' => BASE_PATH . '/storage',
+                ],
             ],
         ];
     }
