@@ -6,7 +6,7 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\Context;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;
-use Jiajushe\HyperfHelper\JsonRPCInterface\CustomerTokenJsonRPCInterface;
+use Jiajushe\HyperfHelper\JsonRPCInterface\AdminTokenJsonRPCInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,9 +14,9 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * 公用 customer token 验证中间件.
+ * 公用 Admin 权限 验证中间件.
  */
-class CustomerTokenJsonRPC implements MiddlewareInterface
+class AdminPermissionJsonRPC implements MiddlewareInterface
 {
     /**
      * @var ContainerInterface
@@ -26,7 +26,7 @@ class CustomerTokenJsonRPC implements MiddlewareInterface
     /**
      * @Inject
      */
-    protected CustomerTokenJsonRPCInterface $customerTokenJsonRPC;
+    protected AdminTokenJsonRPCInterface $adminTokenJsonRPC;
 
     public function __construct(ContainerInterface $container)
     {
@@ -43,7 +43,7 @@ class CustomerTokenJsonRPC implements MiddlewareInterface
         if (!$token) {
             throw new CustomNormal('请先登录', config('res_code.token'));
         }
-        $res = $this->customerTokenJsonRPC->verify($token);
+        $res = $this->adminTokenJsonRPC->permission($token, $request->getMethod(), $request->getUri()->getPath());
         $middlewareHandler = new Handler();
         $request = $middlewareHandler->getRequest($res, $request);
         $response = $handler->handle($request);

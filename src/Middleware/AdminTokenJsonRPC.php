@@ -1,4 +1,5 @@
 <?php
+
 namespace Jiajushe\HyperfHelper\Middleware;
 
 use Hyperf\Di\Annotation\Inject;
@@ -39,31 +40,13 @@ class AdminTokenJsonRPC implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $token = $request->getHeaderLine('Authorization');
-        if (! $token) {
+        if (!$token) {
             throw new CustomNormal('请先登录', config('res_code.token'));
         }
         $res = $this->adminTokenJsonRPC->verify($token);
-        switch ($res['code']) {
-            case config('res_code.normal'):
-                $payload = $res['response']['payload'];
-                $request = Context::override(ServerRequestInterface::class, function () use ($request, $payload) {
-                    foreach ($payload as $index => $item) {
-                        $request = $request->withAddedHeader('payload-' . $index, $item);
-                    }
-                    return $request;
-                });
-                break;
-            case config('res_code.alert'):
-            case config('res_code.token'):
-                throw new CustomNormal($res['msg'], $res['code']);
-            default:
-                throw new CustomError($res['msg'], $res['code']);
-        }
+        $middlewareHandler = new Handler();
+        $request = $middlewareHandler->getRequest($res, $request);
         $response = $handler->handle($request);
-        //刷新token
-        if ($res['response']['new_token']) {
-            $response = $response->withHeader('Authorization', $res['response']['new_token']);
-        }
-        return $response;
+        return $middlewareHandler->getResponse($res, $response);
     }
 }

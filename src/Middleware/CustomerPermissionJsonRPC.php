@@ -14,9 +14,9 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * 公用 customer token 验证中间件.
+ * 公用 customer 权限 验证中间件.
  */
-class CustomerTokenJsonRPC implements MiddlewareInterface
+class CustomerPermissionJsonRPC implements MiddlewareInterface
 {
     /**
      * @var ContainerInterface
@@ -43,7 +43,7 @@ class CustomerTokenJsonRPC implements MiddlewareInterface
         if (!$token) {
             throw new CustomNormal('请先登录', config('res_code.token'));
         }
-        $res = $this->customerTokenJsonRPC->verify($token);
+        $res = $this->customerTokenJsonRPC->permission($token, $request->getMethod(), $request->getUri()->getPath());
         $middlewareHandler = new Handler();
         $request = $middlewareHandler->getRequest($res, $request);
         $response = $handler->handle($request);
