@@ -52,10 +52,10 @@ class Token
      * 校验token
      * @param string $model
      * @param string $user_token
-     * @return object
+     * @return array
      * @throws CustomNormal|CustomError
      */
-    public function verify(string $model, string $user_token): object
+    public function verify(string $model, string $user_token): array
     {
         try {
             $config = config('jwt');
@@ -64,7 +64,7 @@ class Token
             if ($payload->iss != $model) {
                 throw new SignatureInvalidException();
             }
-            return $payload;
+            return (array)$payload;
         } catch (InvalidArgumentException $e) {
             throw new CustomNormal('没有签名', config('res_code.token'));
         } catch (BeforeValidException $e) {
@@ -80,18 +80,18 @@ class Token
 
     /**
      * 刷新token
-     * @param stdClass $payload
+     * @param array $payload
      * @return string|null
      * @throws CustomError
      */
-    public function refresh(stdClass $payload): ?string
+    public function refresh(array $payload): ?string
     {
-        if ($payload->refresh < ($payload->exp - time())) {
+        if ($payload['refresh'] < ($payload['exp'] - time())) {
             return null;
         }
-        $user_id = $payload->sub;
-        $model = new $payload->iss ();
+        $user_id = $payload['sub'];
+        $model = new $payload['iss'] ();
         $user = $model->find($user_id);
-        return $this->make($payload->iss, $user);
+        return $this->make($payload['iss'], $user);
     }
 }
