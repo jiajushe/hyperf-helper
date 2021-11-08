@@ -45,8 +45,8 @@ class AdminTokenJsonRPC implements MiddlewareInterface
         }
         $res = $this->adminTokenJsonRPC->verify($token);
         $middlewareHandler = new Handler();
-        $request = $middlewareHandler->getRequest($res, $request);
+        $request = $middlewareHandler->checkTokenJsonRPC($res, $request);
         $response = $handler->handle($request);
-        return $middlewareHandler->getResponse($res, $response);
+        return $middlewareHandler->newTokenInHeader($res['response']['new_token'], $response);
     }
 }

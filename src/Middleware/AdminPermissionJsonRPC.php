@@ -45,8 +45,8 @@ class AdminPermissionJsonRPC implements MiddlewareInterface
         }
         $res = $this->adminTokenJsonRPC->permission($token, $request->getMethod(), $request->getUri()->getPath());
         $middlewareHandler = new Handler();
-        $request = $middlewareHandler->getRequest($res, $request);
+        $request = $middlewareHandler->checkTokenJsonRPC($res, $request);
         $response = $handler->handle($request);
-        return $middlewareHandler->getResponse($res, $response);
+        return $middlewareHandler->newTokenInHeader($res['response']['new_token'], $response);
     }
 }
