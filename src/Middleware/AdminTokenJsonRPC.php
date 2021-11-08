@@ -57,7 +57,7 @@ class AdminTokenJsonRPC implements MiddlewareInterface
             case config('res_code.token'):
                 throw new CustomNormal($res['msg'], $res['code']);
             default:
-                throw new CustomError('AdminTokenJsonRPCInterface error');
+                throw new CustomError($res['msg'], $res['code']);
         }
         $response = $handler->handle($request);
         //刷新token
