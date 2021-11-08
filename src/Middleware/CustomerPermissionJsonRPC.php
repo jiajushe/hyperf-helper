@@ -45,7 +45,7 @@ class CustomerPermissionJsonRPC implements MiddlewareInterface
         }
         $res = $this->customerTokenJsonRPC->permission($token, $request->getMethod(), $request->getUri()->getPath());
         $middlewareHandler = new Handler();
-        $request = $middlewareHandler->checkTokenJsonRPC($res['response']['payload'], $request);
+        $request = $middlewareHandler->checkTokenJsonRPC($res, $request);
         $response = $handler->handle($request);
         return $middlewareHandler->newTokenInHeader($res['response']['new_token'], $response);
     }
