@@ -36,10 +36,10 @@ class Handler
     /**
      * 添加 payload 到请求头
      * @param ServerRequestInterface $request
-     * @param mixed $payload
+     * @param array $payload
      * @return ServerRequestInterface
      */
-    public function payloadInHeader(ServerRequestInterface $request, $payload): ServerRequestInterface
+    public function payloadInHeader(ServerRequestInterface $request, array $payload): ServerRequestInterface
     {
         return Context::override(ServerRequestInterface::class, function () use ($request, $payload) {
             foreach ($payload as $index => $item) {
