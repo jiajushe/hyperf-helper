@@ -19,3 +19,13 @@ function pp(...$arr)
         print_r(PHP_EOL);
     }
 }
+
+/**
+ * 从请求头获取主id
+ */
+function getMid(Hyperf\HttpServer\Contract\RequestInterface $request, string $master_pid = '0'): string
+{
+    $id = $request->getHeaderLine('payload-sub');
+    $pid = $request->getHeaderLine('payload-pid');
+    return $pid == $master_pid ? $id : $pid;
+}
