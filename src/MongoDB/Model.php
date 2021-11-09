@@ -554,8 +554,6 @@ abstract class Model
         if ($id !== '') {
             $this->where('id', '!=', $id);
         }
-        $this->resetOptions();
-        $this->resetFilter();
         return (bool)$this->find();
     }
 
