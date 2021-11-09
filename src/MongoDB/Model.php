@@ -203,13 +203,11 @@ abstract class Model
      */
     final public function paginate(int $page = 1, int $limit = 15): array
     {
-        $total = $this->count();
+        $total = $this->count(false);
         $skip = ($page - 1) * $limit;
         $total_page = (int)ceil($total / $limit);
         $this->skip($skip)->limit($limit);
         $data = $this->limit($limit)->skip($skip)->all();
-        $this->resetOptions();
-        $this->resetFilter();
         return [
             'total' => $total,
             'total_page' => $total_page,
@@ -316,9 +314,10 @@ abstract class Model
 
     /**
      * 获取数据条数
+     * @param bool $reset
      * @return int
      */
-    final public function count(): int
+    final public function count(bool $reset = true): int
     {
         if (!$this->options[self::LIMIT_OPT]) {
             unset($this->options[self::LIMIT_OPT]);
@@ -327,8 +326,10 @@ abstract class Model
             unset($this->options[self::SKIP_OPT]);
         }
         $res = $this->modelTask->count($this->config, $this->getFilter(), $this->options);
-        $this->resetFilter();
-        $this->resetOptions();
+        if ($reset) {
+            $this->resetFilter();
+            $this->resetOptions();
+        }
         return $res;
     }
 
