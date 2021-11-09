@@ -108,12 +108,19 @@ class ConfigProvider
                     'source' => __DIR__ . '/../publish/services.php',
                     'destination' => BASE_PATH . '/config/autoload/services.php',
                 ],
-//                storage
+//                validation en
                 [
-                    'id' => 'storage',
-                    'description' => 'The storage.',
-                    'source' => __DIR__ . '/../storage',
-                    'destination' => BASE_PATH . '/storage',
+                    'id' => 'validation_en',
+                    'description' => 'The validation_en.',
+                    'source' => __DIR__ . '/../storage/languages/en/validation.php',
+                    'destination' => BASE_PATH . '/storage/languages/en/validation.php',
+                ],
+//                validation zh
+                [
+                    'id' => 'validation_zh',
+                    'description' => 'The validation_zh.',
+                    'source' => __DIR__ . '/../storage/languages/zh_CN/validation.php',
+                    'destination' => BASE_PATH . '/storage/languages/zh_CN/validation.php',
                 ],
             ],
         ];
