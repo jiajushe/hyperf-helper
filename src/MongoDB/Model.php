@@ -169,7 +169,10 @@ abstract class Model
      */
     final public function all(): Collection
     {
-        return $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+        $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+        $this->resetFilter();
+        $this->resetOptions();
+        return $res;
     }
 
     /**
@@ -186,6 +189,8 @@ abstract class Model
         }
         $this->options[self::LIMIT_OPT] = 1;
         $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+        $this->resetFilter();
+        $this->resetOptions();
         return $res->first();
     }
 
@@ -203,6 +208,8 @@ abstract class Model
         $total_page = (int)ceil($total / $limit);
         $this->skip($skip)->limit($limit);
         $data = $this->limit($limit)->skip($skip)->all();
+        $this->resetOptions();
+        $this->resetFilter();
         return [
             'total' => $total,
             'total_page' => $total_page,
@@ -267,7 +274,10 @@ abstract class Model
         if (!$this->options[self::SKIP_OPT]) {
             unset($this->options[self::SKIP_OPT]);
         }
-        return $this->modelTask->count($this->config, $this->getFilter(), $this->options);
+        $res = $this->modelTask->count($this->config, $this->getFilter(), $this->options);
+        $this->resetFilter();
+        $this->resetOptions();
+        return $res;
     }
 
     /**
@@ -538,14 +548,14 @@ abstract class Model
      */
     final public function isUnique(array $filter, string $id = ''): bool
     {
-        $this->resetOptions();
-        $this->resetFilter();
         foreach ($filter as $f => $v) {
             $this->where($f, '=', $v);
         }
         if ($id !== '') {
             $this->where('id', '!=', $id);
         }
+        $this->resetOptions();
+        $this->resetFilter();
         return (bool)$this->find();
     }
 

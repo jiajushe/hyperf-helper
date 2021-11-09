@@ -2,6 +2,8 @@
 
 composer update
 
+php bin/hyperf.php vendor:publish jiajushe/hyperf-helper
+
 创建数据卷目录
 
 mkdir -p /server/docker-volumes/saas-auth
