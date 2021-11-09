@@ -233,7 +233,10 @@ abstract class Model
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
-        return $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
+        $res = $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
+        $this->resetOptions();
+        $this->resetFilter();
+        return $res;
     }
 
     /**
@@ -251,7 +254,10 @@ abstract class Model
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
-        return $this->modelTask->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
+        $res = $this->modelTask->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
+        $this->resetOptions();
+        $this->resetFilter();
+        return $res;
     }
 
     /**
@@ -268,7 +274,10 @@ abstract class Model
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
-        return $this->modelTask->inc($this->config, $this->getFilter(), $document, $timeout);
+        $res = $this->modelTask->inc($this->config, $this->getFilter(), $document, $timeout);
+        $this->resetOptions();
+        $this->resetFilter();
+        return $res;
     }
 
     /**
@@ -299,7 +308,10 @@ abstract class Model
         if ($id) {
             $this->where('id', '=', $id);
         }
-        return $this->modelTask->delete($this->config, $this->getFilter(), $timeout);
+        $res = $this->modelTask->delete($this->config, $this->getFilter(), $timeout);
+        $this->resetOptions();
+        $this->resetFilter();
+        return $res;
     }
 
     /**
