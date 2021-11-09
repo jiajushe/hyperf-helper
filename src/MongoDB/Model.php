@@ -236,6 +236,46 @@ abstract class Model
         return $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
     }
 
+    /**
+     * 更新或插入
+     * @param array $document
+     * @param array $default
+     * @param int $timeout
+     * @return array
+     * @throws CustomError
+     */
+    final public function upsert(array $document, array $default = [], int $timeout = 30000): array
+    {
+        $document = $this->addUpdated($document);
+        if (isset($document['id'])) {
+            $this->where('id', '=', $document['id']);
+            unset($document['id']);
+        }
+        return $this->modelTask->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
+    }
+
+    /**
+     * 自增减
+     * @param array $document [filed => num, ...]
+     * @param int $timeout
+     * @return array
+     * @throws CustomError
+     */
+    final public function inc(array $document, int $timeout = 30000): array
+    {
+        $document = $this->addUpdated($document);
+        if (isset($document['id'])) {
+            $this->where('id', '=', $document['id']);
+            unset($document['id']);
+        }
+        return $this->modelTask->inc($this->config, $this->getFilter(), $document, $timeout);
+    }
+
+    /**
+     * 添加更新时间
+     * @param array $document
+     * @return array
+     */
     final protected function addUpdated(array $document): array
     {
         if (!$this->updated_at) {

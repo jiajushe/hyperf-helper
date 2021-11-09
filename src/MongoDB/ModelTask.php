@@ -109,6 +109,57 @@ class ModelTask
     }
 
     /**
+     * 更新或插入
+     * @Task(timeout=30)
+     * @param array $config
+     * @param array $filter
+     * @param array $document
+     * @param array $default
+     * @param int $timeout
+     * @return array
+     */
+    public function upsert(array $config, array $filter, array $document, array $default = [], int $timeout = 1000): array
+    {
+        $bulkWrite = $this->bulkWrite();
+        $bulkWrite->update($filter,
+            [
+                '$set' => $document,
+                '$setOnInsert' => $default,
+            ],
+            ['multi' => true, 'upsert' => true]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        return [
+            'confirm' => $res->isAcknowledged(),
+            'error' => $res->getWriteConcernError(),
+            'error_arr' => $res->getWriteErrors(),
+            'matched' => $res->getMatchedCount(),
+            'modified' => $res->getModifiedCount(),
+        ];
+    }
+
+    /**
+     * 自增减
+     * @param array $config
+     * @param array $filter
+     * @param array $document
+     * @param int $timeout
+     * @return array
+     */
+    public function inc(array $config, array $filter, array $document, int $timeout = 1000): array
+    {
+        $bulkWrite = $this->bulkWrite();
+        $bulkWrite->update($filter, ['$inc' => $document], ['multi' => true, 'upsert' => false]);
+        $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
+        return [
+            'confirm' => $res->isAcknowledged(),
+            'error' => $res->getWriteConcernError(),
+            'error_arr' => $res->getWriteErrors(),
+            'matched' => $res->getMatchedCount(),
+            'modified' => $res->getModifiedCount(),
+        ];
+    }
+
+    /**
      * 删除
      * @Task(timeout=30)
      * @param array $config
@@ -116,7 +167,8 @@ class ModelTask
      * @param int $timeout
      * @return array
      */
-    public function delete(array $config, array $filter, int $timeout = 1000): array
+    public
+    function delete(array $config, array $filter, int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->delete($filter);
@@ -138,7 +190,8 @@ class ModelTask
      * @return \Hyperf\Utils\Collection
      * @throws Exception
      */
-    public function query(array $config, array $filter, array $options = []): \Hyperf\Utils\Collection
+    public
+    function query(array $config, array $filter, array $options = []): \Hyperf\Utils\Collection
     {
         $query = new Query($filter, $options);
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
@@ -161,7 +214,8 @@ class ModelTask
      * @param array $options
      * @return int
      */
-    public function count(array $config, array $filter = [], array $options = []): int
+    public
+    function count(array $config, array $filter = [], array $options = []): int
     {
         return $this->collection($config)->countDocuments($filter, $options);
     }
