@@ -311,7 +311,13 @@ abstract class Model
         }
         if ($field === 'id') {
             $field = '_id';
-            $value = new ObjectId($value);
+            if (is_array($value)) {
+                foreach ($value as $k => $item) {
+                    $value[$k] = new ObjectId($item);
+                }
+            } else {
+                $value = new ObjectId($value);
+            }
         }
         if (!empty(self::OPERATORS[$operator])) {
             if ($operator === 'between') {
