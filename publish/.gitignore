@@ -22,3 +22,5 @@ vendor/
 /config/autoload/jwt.php
 /config/autoload/exceptions.php
 /composer.lock
+/storage/languages/zh_CN/validation.php
+/storage/languages/en/validation.php
