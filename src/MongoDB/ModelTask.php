@@ -125,9 +125,7 @@ class ModelTask
             $new['$setOnInsert'] = $default;
         }
         $bulkWrite = $this->bulkWrite();
-        $bulkWrite->update($filter,
-            $new,
-            ['multi' => true, 'upsert' => true]);
+        $bulkWrite->update($filter, $new, ['multi' => true, 'upsert' => true]);
         $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
             'confirm' => $res->isAcknowledged(),
