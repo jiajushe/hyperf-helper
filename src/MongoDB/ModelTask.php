@@ -120,12 +120,13 @@ class ModelTask
      */
     public function upsert(array $config, array $filter, array $document, array $default = [], int $timeout = 1000): array
     {
+        $new = ['$set' => $document];
+        if ($default) {
+            $new['$setOnInsert'] = $default;
+        }
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->update($filter,
-            [
-                '$set' => $document,
-                '$setOnInsert' => $default,
-            ],
+            $new,
             ['multi' => true, 'upsert' => true]);
         $res = $this->manager($config)->executeBulkWrite($this->namespace($config), $bulkWrite, ['writeConcern' => $this->writeConcern($timeout)]);
         return [
