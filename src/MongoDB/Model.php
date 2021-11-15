@@ -129,6 +129,7 @@ abstract class Model
      */
     final public function create(array $document, int $timeout = 30000): array
     {
+        $document = $this->setAttr($document);
         $document = $this->addTime([$document]);
         return $this->modelTask->insert($this->config, $document, $timeout);
     }
@@ -141,6 +142,9 @@ abstract class Model
      */
     final public function insert(array $document, int $timeout = 30000): array
     {
+        foreach ($document as $index => $item) {
+            $document[$index] = $this->setAttr($item);
+        }
         $document = $this->addTime($document);
         return $this->modelTask->insert($this->config, $document, $timeout);
     }
@@ -226,6 +230,7 @@ abstract class Model
      */
     final public function update(array $document, int $timeout = 30000): array
     {
+        $document = $this->setAttr($document);
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
             $this->where('id', '=', $document['id']);
@@ -247,6 +252,7 @@ abstract class Model
      */
     final public function upsert(array $document, array $default = [], int $timeout = 30000): array
     {
+        $document = $this->setAttr($document);
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
             $this->where('id', '=', $document['id']);
@@ -629,6 +635,22 @@ abstract class Model
     public function __call($name, $arguments)
     {
         return '';
+    }
+
+    /**
+     * 插入／更新修改器
+     * @param array $document
+     * @return array
+     */
+    final protected function setAttr(array $document): array
+    {
+        foreach ($document as $index => $value) {
+            $method = 'set' . Str::ucfirst(Str::camel($index)) . 'Attr';
+            if (method_exists($this, $method)) {
+                $document[$index] = $this->{$method}($value, $document);
+            }
+        }
+        return $document;
     }
 
     /**
