@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact
  * @license
  */
+
 namespace Jiajushe\HyperfHelper\JsonRPCInterface;
 
 interface AuthCommonJsonRPCInterface
@@ -17,5 +18,5 @@ interface AuthCommonJsonRPCInterface
      * 通过customer_id获取信息.
      * @param string $customer_id
      */
-    public function getInfoByCustomerId(string $customer_id);
+    public function getInfoByCustomerId(string $customer_id): array;
 }
