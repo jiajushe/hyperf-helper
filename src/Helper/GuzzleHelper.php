@@ -9,12 +9,14 @@ declare(strict_types=1);
  * @contact
  * @license
  */
+
 namespace Jiajushe\HyperfHelper\Helper;
 
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Guzzle\ClientFactory;
 use Hyperf\Utils\Codec\Json;
 use Jiajushe\HyperfHelper\Exception\CustomError;
+use Jiajushe\HyperfHelper\MongoDB\GuzzleErrorLog;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 
@@ -40,12 +42,12 @@ class GuzzleHelper
         try {
             $response = $this->clientFactory->create()->request($method, $uri, $options);
             if ($response->getStatusCode() != 200) {
-                throw new CustomError('weixin connect error');
+                throw new CustomError('guzzle connect error');
             }
             return $response;
         } catch (Throwable $t) {
-            $this->errorLog($t, [$method, $uri, $options]);
-            throw new CustomError('weixin connect error');
+            $this->errorLog($t, ['method' => $method, 'uri' => $uri, 'query' => $query, 'options' => $options]);
+            throw new CustomError('guzzle connect error');
         }
     }
 
@@ -66,14 +68,18 @@ class GuzzleHelper
      */
     private function errorLog(Throwable $throwable, array $data)
     {
-//        todo http请求错误记录
-        pp(
-            $data,
-            $throwable->getMessage(),
-            $throwable->getCode(),
-            $throwable->getLine(),
-            $throwable->getFile(),
-            $throwable->getTrace()
-        );
+        (new GuzzleErrorLog())->create([
+            'method' => $data['method'],
+            'uri' => $data['uri'],
+            'query' => $data['query'],
+            'options' => $data['options'],
+            'code' => $throwable->getCode(),
+            'msg' => $throwable->getMessage(),
+            'class_name' => get_class($throwable),
+            'line' => $throwable->getLine(),
+            'file' => $throwable->getFile(),
+            'previous' => $throwable->getPrevious(),
+            'trace' => $throwable->getTrace()
+        ]);
     }
 }
