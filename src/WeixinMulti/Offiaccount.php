@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact
  * @license
  */
+
 namespace Jiajushe\HyperfHelper\WeixinMulti;
 
 use Jiajushe\HyperfHelper\Exception\CustomError;
@@ -20,11 +21,10 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class Offiaccount
 {
-    public const URI_ACCESS_TOKEN = 'https://api.weixin.qq.com/cgi-bin/token';
-
-    public const URI_AUTH_ACCESS_TOKEN = 'https://api.weixin.qq.com/sns/oauth2/access_token';
-
-    public const URI_AUTH_USERINFO = 'https://api.weixin.qq.com/sns/userinfo';
+    public const URI_ACCESS_TOKEN = 'https://api.weixin.qq.com/cgi-bin/token';//获取access_token
+    public const URI_AUTH_ACCESS_TOKEN = 'https://api.weixin.qq.com/sns/oauth2/access_token';//网页授权
+    public const URI_AUTH_USERINFO = 'https://api.weixin.qq.com/sns/userinfo';//网页授权
+    public const URI_MESSAGE_TEMPLATE = 'https://api.weixin.qq.com/cgi-bin/message/template/send';//发送模板消息
 
     protected string $appid;
 
@@ -72,8 +72,6 @@ class Offiaccount
 
     /**
      * 公众号网页授权.
-     * appid=APPID&secret=SECRET&code=CODE&grant_type=authorization_code.
-     * https://api.weixin.qq.com/sns/userinfo?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN.
      * @throws CustomError
      * @throws CustomNormal
      */
@@ -105,5 +103,48 @@ class Offiaccount
             throw new CustomNormal('微信授权失败');
         }
         return $userinfo;
+    }
+
+    /**
+     * 发送模板消息.
+     * @param array $data
+     * [
+     *  "touser"=>"OPENID",(必须)
+     *  "template_id"=>"ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY",(必须)
+     *  "url":"http://weixin.qq.com/download",
+     *  "miniprogram"=>[
+     *      "appid"=>"xiaochengxuappid12345",(必须)
+     *      "pagepath"=>"index?foo=bar"
+     *  ],
+     * "data"=>[(必须)
+     *      "first": [
+     *          "value"=>"恭喜你购买成功！",(必须)
+     *          "color"=>"#173177"
+     *      ],
+     *      "keyword1":[
+     *          "value"=>"巧克力",(必须)
+     *          "color"=>"#173177"
+     *      ],
+     *      "remark":[
+     *          "value"=>"欢迎再次购买！",(必须)
+     *          "color"=>"#173177"
+     *      ]
+     *   ]
+     * ]
+     * @return bool
+     * @throws CustomError
+     */
+    public function messageTemplate(array $data): bool
+    {
+        $access_token = $this->getAccessToken();
+        $uri = self::URI_MESSAGE_TEMPLATE . '?access_token=' . $access_token;
+        $method = 'post';
+        $guzzleHelper = new GuzzleHelper();
+        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, $uri, $data));
+        if ($res['errcode'] != 0) {
+            (new WeixinErrorLog())->log($this->appid, $method, self::URI_MESSAGE_TEMPLATE, $data, $res);
+            throw new CustomError('获取access_token失败');
+        }
+        return true;
     }
 }
