@@ -47,7 +47,7 @@ class Offiaccount
      * @throws CustomError
      * @throws NotFoundExceptionInterface
      */
-    public function getAccessToken(): string
+    protected function getAccessToken(): string
     {
         $redis_prefix = $this->getRedisPrefix() . 'ACCOUNT_TOKEN:' . $this->appid;
         $redis = Common::getRedis();
