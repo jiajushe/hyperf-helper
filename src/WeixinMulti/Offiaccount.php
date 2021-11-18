@@ -136,14 +136,18 @@ class Offiaccount
      */
     public function messageTemplate(array $data): bool
     {
-        $access_token = $this->getAccessToken();
-        $uri = self::URI_MESSAGE_TEMPLATE . '?access_token=' . $access_token;
         $method = 'post';
+        $query = [
+            'access_token' => $this->getAccessToken(),
+        ];
+        $options = [
+            'json' => $data,
+        ];
         $guzzleHelper = new GuzzleHelper();
-        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, $uri, $data));
+        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_MESSAGE_TEMPLATE, $query, $options));
         if ($res['errcode'] != 0) {
             (new WeixinErrorLog())->log($this->appid, $method, self::URI_MESSAGE_TEMPLATE, $data, $res);
-            throw new CustomError('获取access_token失败');
+            throw new CustomError('发送失败');
         }
         return true;
     }
