@@ -2,7 +2,7 @@
 
 namespace Jiajushe\HyperfHelper\MongoDB;
 
-class GuzzleErrorLog extends Model
+class WeixinErrorLog extends Model
 {
     public function log(string $appid, $method, string $uri, array $query, array $response)
     {
