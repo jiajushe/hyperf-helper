@@ -11,6 +11,7 @@ use MongoDB\Driver\BulkWrite;
 use MongoDB\Driver\Query;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
+use Traversable;
 
 
 class ModelTask
@@ -138,6 +139,7 @@ class ModelTask
 
     /**
      * 自增减
+     * @Task(timeout=30)
      * @param array $config
      * @param array $filter
      * @param array $document
@@ -166,8 +168,7 @@ class ModelTask
      * @param int $timeout
      * @return array
      */
-    public
-    function delete(array $config, array $filter, int $timeout = 1000): array
+    public function delete(array $config, array $filter, int $timeout = 1000): array
     {
         $bulkWrite = $this->bulkWrite();
         $bulkWrite->delete($filter);
@@ -189,8 +190,7 @@ class ModelTask
      * @return \Hyperf\Utils\Collection
      * @throws Exception
      */
-    public
-    function query(array $config, array $filter, array $options = []): \Hyperf\Utils\Collection
+    public function query(array $config, array $filter, array $options = []): \Hyperf\Utils\Collection
     {
         $query = new Query($filter, $options);
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
@@ -213,9 +213,21 @@ class ModelTask
      * @param array $options
      * @return int
      */
-    public
-    function count(array $config, array $filter = [], array $options = []): int
+    public function count(array $config, array $filter = [], array $options = []): int
     {
         return $this->collection($config)->countDocuments($filter, $options);
+    }
+
+    /**
+     * 聚合和联表查询
+     * @Task (timeout=30)
+     * @param array $config
+     * @param array $pipeline
+     * @param array $options
+     * @return Traversable
+     */
+    public function aggregate(array $config, array $pipeline, array $options = []): Traversable
+    {
+        return $this->collection($config)->aggregate($pipeline, $options);
     }
 }

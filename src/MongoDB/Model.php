@@ -11,6 +11,7 @@ use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\Exception\Exception;
+use Traversable;
 
 abstract class Model
 {
@@ -506,6 +507,17 @@ abstract class Model
     {
         $this->filter['$and'][] = $filter;
         return $this;
+    }
+
+    /**
+     * 聚合和联表查询
+     * @param array $pipeline
+     * @param array $options
+     * @return Traversable
+     */
+    final public function aggregate(array $pipeline, array $options = []): Traversable
+    {
+        return $this->modelTask->aggregate($this->config, $pipeline, $options);
     }
 
     /**
