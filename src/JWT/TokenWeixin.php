@@ -19,10 +19,11 @@ class TokenWeixin
      * 生成token
      * @param string $master_id
      * @param string $openid
+     * @param string $weixin
      * @return string
      * @throws CustomError
      */
-    public function make(string $master_id, string $openid): string
+    public function make(string $master_id, string $openid, string $weixin): string
     {
         try {
             $config = config('jwt');
@@ -34,6 +35,7 @@ class TokenWeixin
                 'refresh' => $config['refresh_second'], //刷新时间
                 'nbf' => $time, //某个时间点后才能访问
                 'iat' => $time, //签发时间
+                'weixin' => $weixin,// 微信类型
             ];
             return JWT::encode($payload, $config['secret']);
         } catch (Throwable $t) {
@@ -44,16 +46,20 @@ class TokenWeixin
     /**
      * 校验token
      * @param string $token
+     * @param string $weixin
      * @return array
      * @throws CustomError
      * @throws CustomNormal
      */
-    public function verify(string $token): array
+    public function verify(string $token, string $weixin): array
     {
         try {
             $config = config('jwt');
             JWT::$leeway = $config['leeway_second'];
             $payload = JWT::decode($token, $config['secret'], ['HS256']);
+            if ($weixin != $payload->weixin) {
+                throw new SignatureInvalidException();
+            }
             return (array)$payload;
         } catch (InvalidArgumentException $e) {
             throw new CustomNormal('没有签名', config('res_code.token'));
@@ -79,8 +85,6 @@ class TokenWeixin
         if ($payload['refresh'] < ($payload['exp'] - time())) {
             return null;
         }
-        $openid = $payload['sub'];
-        $master_id = $payload['iss'];
-        return $this->make($master_id, $openid);
+        return $this->make($payload['iss'], $payload['sub'], $payload['weixin']);
     }
 }
