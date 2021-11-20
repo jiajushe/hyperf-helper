@@ -268,9 +268,7 @@ class ModelTask
                         foreach ($join as $k => $r) {
                             if ($r instanceof ObjectId) {
                                 if ($k == '_id') {
-                                    $row->{$index}[$key]->_id = (string)$r;
-                                    $k->id = (string)$r;
-                                    unset($row->_id);
+                                    $row->{$index}[$key]->id = (string)$r;
                                     unset($row->{$index}[$key]->_id);
                                 } else {
                                     $row->{$index}[$key]->{$k} = (string)$r;
