@@ -790,8 +790,11 @@ abstract class Model
 
     /**
      * 追加字段.
+     * @param object|array $data
+     * @param array $field
+     * @return array|object
      */
-    final public function append(object $data, array $field): object
+    final public function append($data, array $field)
     {
         $changed = [];
         foreach ($field as $item) {
@@ -801,6 +804,11 @@ abstract class Model
             $data->each(function ($item) use ($field) {
                 return $this->append($item, $field);
             });
+        } elseif (is_array($data)){
+            foreach ($data as $index => $row) {
+                $data[$index] = $this->append($row, $field);
+            }
+            return $data;
         } else {
             foreach ($changed as $index => $item) {
                 if (in_array($index, [$this->created_at, $this->updated_at])) {
@@ -812,7 +820,6 @@ abstract class Model
                 }
             }
         }
-
         return $data;
     }
 
