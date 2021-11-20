@@ -14,8 +14,6 @@ use MongoDB\Driver\Query;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 use stdClass;
-use Traversable;
-
 
 class ModelTask
 {
