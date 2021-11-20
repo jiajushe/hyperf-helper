@@ -57,7 +57,7 @@ class TokenWeixin
             $config = config('jwt');
             JWT::$leeway = $config['leeway_second'];
             $payload = JWT::decode($token, $config['secret'], ['HS256']);
-            if ($weixin != $payload->weixin) {
+            if (!isset($payload->weixin) || $weixin != $payload->weixin) {
                 throw new SignatureInvalidException();
             }
             return (array)$payload;
