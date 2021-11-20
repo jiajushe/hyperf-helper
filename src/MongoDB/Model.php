@@ -59,6 +59,19 @@ abstract class Model
      */
     protected array $filter = [];
 
+    /**
+     * @var array 聚合查询表达式
+     */
+    protected array $pipeline = [];
+
+    /**
+     * @return array
+     */
+    public function getPipeline(): array
+    {
+        return $this->pipeline;
+    }
+
     protected const PROJECTION_OPT = 'projection';
     protected const LIMIT_OPT = 'limit';
     protected const SKIP_OPT = 'skip';
@@ -83,6 +96,7 @@ abstract class Model
         $this->config = $config;
         $this->resetOptions();
         $this->resetFilter();
+        $this->resetPipeline();
     }
 
     /**
@@ -107,6 +121,16 @@ abstract class Model
     final public function resetFilter(): Model
     {
         $this->filter = ['$and' => []];
+        return $this;
+    }
+
+    /**
+     * 重置聚合查询表达式
+     * @return $this
+     */
+    final public function resetPipeline(): Model
+    {
+        $this->pipeline = [];
         return $this;
     }
 
@@ -174,9 +198,15 @@ abstract class Model
      */
     final public function all(): Collection
     {
-        $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+        $pipeline = $this->getPipeline();
+        if ($pipeline) {
+            $res = $this->modelTask->aggregate($this->config, $pipeline);
+        } else {
+            $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+        }
         $this->resetFilter();
         $this->resetOptions();
+        $this->resetPipeline();
         return $res;
     }
 
@@ -192,9 +222,20 @@ abstract class Model
         if ($id) {
             $this->where('id', '=', $id);
         }
-        $this->options[self::LIMIT_OPT] = 1;
-        $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+        $pipeline = $this->getPipeline();
+        $filter = $this->getFilter();
+        if ($pipeline) {
+            if ($filter) {
+                $pipeline[] = ['$match' => $filter];
+            }
+            $pipeline[] = ['$limit' => 1];
+            $res = $this->modelTask->aggregate($this->config, $pipeline);
+        } else {
+            $this->options[self::LIMIT_OPT] = 1;
+            $res = $this->modelTask->query($this->config, $filter, $this->options);
+        }
         $this->resetFilter();
+        $this->resetPipeline();
         $this->resetOptions();
         return $res->first();
     }
@@ -381,13 +422,7 @@ abstract class Model
         }
         if ($field === 'id') {
             $field = '_id';
-            if (is_array($value)) {
-                foreach ($value as $k => $item) {
-                    $value[$k] = new ObjectId($item);
-                }
-            } else {
-                $value = new ObjectId($value);
-            }
+            $value = $this->getObjectId($value);
         }
         if (!empty(self::OPERATORS[$operator])) {
             if ($operator === 'between') {
@@ -428,7 +463,7 @@ abstract class Model
         foreach ($conditions as $condition) {
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
-                $condition[2] = new ObjectId($condition[2]);
+                $condition[2] = $this->getObjectId($condition[2]);
             }
             if ($condition[1] === 'between') {
                 if (!is_array($condition[2])) {
@@ -469,7 +504,7 @@ abstract class Model
         foreach ($conditions as $condition) {
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
-                $condition[2] = new ObjectId($condition[2]);
+                $condition[2] = $this->getObjectId($condition[2]);
             }
             if ($condition[1] === 'between') {
                 if (!is_array($condition[2])) {
@@ -515,9 +550,81 @@ abstract class Model
      * @param array $options
      * @return Traversable
      */
-    final public function aggregate(array $pipeline, array $options = []): Traversable
+    final public function aggregate(array $pipeline, array $options = [])
     {
+        $filter = $this->getFilter();
+        if ($filter) {
+            $pipeline[] = ['$match' => $filter];
+        }
         return $this->modelTask->aggregate($this->config, $pipeline, $options);
+    }
+
+    /**
+     * for aggregate
+     * @param array $lookup
+     * [
+     *  'from' => 'collection_name',
+     *  'localField' => 'expo_id',
+     *  'foreignField' => '_id',
+     *  'as' => 'collection_name_items',
+     * ]
+     * @return $this
+     */
+    final public function join(array $lookup)
+    {
+        $pipeline = $this->pipeline;
+        $pipeline[] = ['$lookup' => $lookup];
+        $this->pipeline = $pipeline;
+        return $this;
+    }
+
+    /**
+     * for aggregate
+     * 多种写法，要查文档
+     * @param array $group
+     * @return $this
+     */
+    final public function group(array $group)
+    {
+        $pipeline = $this->pipeline;
+        $pipeline[] = ['$group' => $group];
+        $this->pipeline = $pipeline;
+        return $this;
+    }
+
+    /**
+     * for aggregate　选择字段
+     * ['filed1'=>1,'filed2'=>0]
+     */
+    final public function project(array $project)
+    {
+        $pipeline = $this->pipeline;
+        $pipeline[] = ['$project' => $project];
+        $this->pipeline = $pipeline;
+        return $this;
+    }
+
+    /**
+     * for aggregate　排序
+     * ['filed1'=>1,'filed2'=>0]
+     */
+    final public function order(array $sort)
+    {
+        $pipeline = $this->pipeline;
+        $pipeline[] = ['$sort' => $sort];
+        $this->pipeline = $pipeline;
+        return $this;
+    }
+
+    /**
+     * for aggregate　where
+     */
+    final public function match(array $match)
+    {
+        $pipeline = $this->pipeline;
+        $pipeline[] = ['$match' => $match];
+        $this->pipeline = $pipeline;
+        return $this;
     }
 
     /**
@@ -696,5 +803,10 @@ abstract class Model
     final public function getDateStr(int $timestamp)
     {
         return date('Y-m-d H:i:s', $timestamp);
+    }
+
+    final public function getObjectId($value): ObjectId
+    {
+        return new ObjectId($value);
     }
 }

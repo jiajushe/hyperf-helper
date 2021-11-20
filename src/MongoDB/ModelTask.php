@@ -3,14 +3,17 @@
 namespace Jiajushe\HyperfHelper\MongoDB;
 
 use Hyperf\Task\Annotation\Task;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Client;
 use MongoDB\Collection;
 use MongoDB\Driver\Exception\Exception;
 use MongoDB\Driver\Manager;
 use MongoDB\Driver\BulkWrite;
+use MongoDB\Driver\Command;
 use MongoDB\Driver\Query;
 use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
+use stdClass;
 use Traversable;
 
 
@@ -52,6 +55,11 @@ class ModelTask
     final protected function bulkWrite(): BulkWrite
     {
         return new BulkWrite();
+    }
+
+    final protected function command($document, array $options = [])
+    {
+        return new Command($document, $options);
     }
 
     /**
@@ -196,13 +204,18 @@ class ModelTask
         $readPreference = new ReadPreference(ReadPreference::RP_PRIMARY);
         $res = $this->manager($config)->executeQuery($this->namespace($config), $query, $readPreference);
         $res = \Hyperf\Utils\Collection::make($res);
-        if (!isset($options['projection']['_id']) || $options['projection']['_id']) {
-            $res = $res->each(function ($item) {
-                $item->id = (string)$item->_id;
-                unset($item->_id);
-            });
-        }
-        return $res;
+        return $res->each(function ($row) {
+            foreach ($row as $index => $item) {
+                if ($item instanceof ObjectId) {
+                    if ($index == '_id') {
+                        $row->id = (string)$item;
+                        unset($row->_id);
+                    } else {
+                        $row->{$index} = (string)$item;
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -224,10 +237,51 @@ class ModelTask
      * @param array $config
      * @param array $pipeline
      * @param array $options
-     * @return Traversable
+     * @return \Hyperf\Utils\Collection
+     * @throws Exception
      */
-    public function aggregate(array $config, array $pipeline, array $options = []): Traversable
+    public function aggregate(array $config, array $pipeline, array $options = []): \Hyperf\Utils\Collection
     {
-        return $this->collection($config)->aggregate($pipeline, $options);
+        $command = $this->command([
+            'aggregate' => $config['collection'],
+            'pipeline' => $pipeline,
+            'cursor' => new stdClass,
+        ], $options);
+        $res = $this->manager($config)->executeCommand($config['database'], $command)->toArray();
+        $res = \Hyperf\Utils\Collection::make($res);
+        $join_tables = [];
+        foreach ($pipeline as $item) {
+            if (!empty($item['$lookup'])) {
+                $join_tables[] = $item['$lookup']['as'];
+            }
+        }
+        return $res->each(function ($row) use ($join_tables) {
+            foreach ($row as $index => $item) {
+                if ($item instanceof ObjectId) {
+                    if ($index == '_id') {
+                        $row->id = (string)$item;
+                        unset($row->_id);
+                    } else {
+                        $row->{$index} = (string)$item;
+                    }
+                }
+                if (in_array($index, $join_tables)) {
+                    foreach ($row->{$index} as $key => $join) {
+                        foreach ($join as $k => $r) {
+                            if ($r instanceof ObjectId) {
+                                if ($k == '_id') {
+                                    $row->{$index}[$key]->_id = (string)$r;
+                                    $k->id = (string)$r;
+                                    unset($row->_id);
+                                    unset($row->{$index}[$key]->_id);
+                                } else {
+                                    $row->{$index}[$key]->{$k} = (string)$r;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
 }
