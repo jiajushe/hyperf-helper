@@ -55,7 +55,7 @@ class ModelTask
         return new BulkWrite();
     }
 
-    final protected function command($document, array $options = [])
+    final protected function command($document, array $options = []): Command
     {
         return new Command($document, $options);
     }

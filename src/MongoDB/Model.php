@@ -64,13 +64,7 @@ abstract class Model
      */
     protected array $pipeline = [];
 
-    /**
-     * @return array
-     */
-    public function getPipeline(): array
-    {
-        return $this->pipeline;
-    }
+    protected array $objectId_field = [];
 
     protected const PROJECTION_OPT = 'projection';
     protected const LIMIT_OPT = 'limit';
@@ -84,6 +78,7 @@ abstract class Model
      * @var array   查询选项
      */
     protected array $options = [];
+
 
     public function __construct()
     {
@@ -154,6 +149,7 @@ abstract class Model
      */
     final public function create(array $document, int $timeout = 30000): array
     {
+        $document = $this->changeObjectId($document);
         $document = $this->setAttr($document);
         $document = $this->addTime([$document]);
         return $this->modelTask->insert($this->config, $document, $timeout);
@@ -168,6 +164,7 @@ abstract class Model
     final public function insert(array $document, int $timeout = 30000): array
     {
         foreach ($document as $index => $item) {
+            $document[$index] = $this->changeObjectId($item);
             $document[$index] = $this->setAttr($item);
         }
         $document = $this->addTime($document);
@@ -278,6 +275,7 @@ abstract class Model
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
+        $document = $this->changeObjectId($document);
         $res = $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
         $this->resetOptions();
         $this->resetFilter();
@@ -300,6 +298,7 @@ abstract class Model
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
+        $document = $this->changeObjectId($document);
         $res = $this->modelTask->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
         $this->resetOptions();
         $this->resetFilter();
@@ -420,6 +419,9 @@ abstract class Model
             }
             return $this;
         }
+        if ($this->objectId_field && in_array($field, $this->objectId_field)) {
+            $value = $this->getObjectId($value);
+        }
         if ($field === 'id') {
             $field = '_id';
             $value = $this->getObjectId($value);
@@ -461,6 +463,9 @@ abstract class Model
     {
         $filter = [];
         foreach ($conditions as $condition) {
+            if ($this->objectId_field && in_array($condition[0], $this->objectId_field)) {
+                $condition[2] = $this->getObjectId($condition[2]);
+            }
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
                 $condition[2] = $this->getObjectId($condition[2]);
@@ -502,6 +507,9 @@ abstract class Model
     {
         $filter = [];
         foreach ($conditions as $condition) {
+            if ($this->objectId_field && in_array($condition[0], $this->objectId_field)) {
+                $condition[2] = $this->getObjectId($condition[2]);
+            }
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
                 $condition[2] = $this->getObjectId($condition[2]);
@@ -545,21 +553,6 @@ abstract class Model
     }
 
     /**
-     * 聚合和联表查询
-     * @param array $pipeline
-     * @param array $options
-     * @return Traversable
-     */
-    final public function aggregate(array $pipeline, array $options = [])
-    {
-        $filter = $this->getFilter();
-        if ($filter) {
-            $pipeline[] = ['$match' => $filter];
-        }
-        return $this->modelTask->aggregate($this->config, $pipeline, $options);
-    }
-
-    /**
      * for aggregate
      * @param array $lookup
      * [
@@ -570,7 +563,7 @@ abstract class Model
      * ]
      * @return $this
      */
-    final public function join(array $lookup)
+    final public function join(array $lookup): Model
     {
         $pipeline = $this->pipeline;
         $pipeline[] = ['$lookup' => $lookup];
@@ -584,7 +577,7 @@ abstract class Model
      * @param array $group
      * @return $this
      */
-    final public function group(array $group)
+    final public function group(array $group): Model
     {
         $pipeline = $this->pipeline;
         $pipeline[] = ['$group' => $group];
@@ -596,7 +589,7 @@ abstract class Model
      * for aggregate　选择字段
      * ['filed1'=>1,'filed2'=>0]
      */
-    final public function project(array $project)
+    final public function project(array $project): Model
     {
         $pipeline = $this->pipeline;
         $pipeline[] = ['$project' => $project];
@@ -608,7 +601,7 @@ abstract class Model
      * for aggregate　排序
      * ['filed1'=>1,'filed2'=>0]
      */
-    final public function order(array $sort)
+    final public function order(array $sort): Model
     {
         $pipeline = $this->pipeline;
         $pipeline[] = ['$sort' => $sort];
@@ -619,7 +612,7 @@ abstract class Model
     /**
      * for aggregate　where
      */
-    final public function match(array $match)
+    final public function match(array $match): Model
     {
         $pipeline = $this->pipeline;
         $pipeline[] = ['$match' => $match];
@@ -693,6 +686,14 @@ abstract class Model
         return $this->options;
     }
 
+    /**
+     * @return array
+     */
+    public function getPipeline(): array
+    {
+        return $this->pipeline;
+    }
+
     final public function changeTime(array $data, string $format = 'Y-m-d H:i:s'): array
     {
         $created_at = $this->created_at;
@@ -706,6 +707,21 @@ abstract class Model
             }
         }
         return $data;
+    }
+
+    /**
+     * 转换为objectId
+     * @param array $document
+     * @return array
+     */
+    final protected function changeObjectId(array $document): array
+    {
+        foreach ($document as $index => $item) {
+            if (in_array($index, $this->objectId_field)) {
+                $document[$index] = $this->getObjectId($item);
+            }
+        }
+        return $document;
     }
 
     final protected function idTo_id(string $field): string
