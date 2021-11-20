@@ -553,7 +553,7 @@ abstract class Model
     }
 
     /**
-     * for aggregate
+     * for aggregate 关联查询
      * @param array $lookup
      * [
      *  'from' => 'collection_name',
@@ -563,7 +563,7 @@ abstract class Model
      * ]
      * @return $this
      */
-    final public function join(array $lookup): Model
+    final public function lookup(array $lookup): Model
     {
         $pipeline = $this->pipeline;
         $pipeline[] = ['$lookup' => $lookup];
