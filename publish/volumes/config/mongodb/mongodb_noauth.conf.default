@@ -15,3 +15,4 @@ port = 27017
 #是否以安全认证方式运行(即用户登录信息)
 noauth = true
 quiet=true
+enableMajorityReadConcern=true
