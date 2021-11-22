@@ -420,7 +420,13 @@ abstract class Model
             return $this;
         }
         if ($this->objectId_field && in_array($field, $this->objectId_field)) {
-            $value = $this->getObjectId($value);
+            if (is_array($value)) {
+                foreach ($value as $key => $item) {
+                    $value[$key] = $this->getObjectId($item);
+                }
+            } else {
+                $value = $this->getObjectId($value);
+            }
         }
         if ($field === 'id') {
             $field = '_id';
@@ -804,7 +810,7 @@ abstract class Model
             $data->each(function ($item) use ($field) {
                 return $this->append($item, $field);
             });
-        } elseif (is_array($data)){
+        } elseif (is_array($data)) {
             foreach ($data as $index => $row) {
                 $data[$index] = $this->append($row, $field);
             }
