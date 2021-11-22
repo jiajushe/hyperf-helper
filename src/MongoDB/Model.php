@@ -11,7 +11,6 @@ use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Driver\Exception\Exception;
-use Traversable;
 
 abstract class Model
 {
@@ -147,7 +146,7 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function create(array $document, int $timeout = 30000): array
+    final public function create(array $document, int $timeout = 10000): array
     {
         $document = $this->changeObjectId($document);
         $document = $this->setAttr($document);
@@ -161,7 +160,7 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function insert(array $document, int $timeout = 30000): array
+    final public function insert(array $document, int $timeout = 10000): array
     {
         foreach ($document as $index => $item) {
             $document[$index] = $this->changeObjectId($item);
@@ -267,7 +266,7 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function update(array $document, int $timeout = 30000): array
+    final public function update(array $document, int $timeout = 10000): array
     {
         $document = $this->setAttr($document);
         $document = $this->addUpdated($document);
@@ -290,7 +289,7 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function upsert(array $document, array $default = [], int $timeout = 30000): array
+    final public function upsert(array $document, array $default = [], int $timeout = 10000): array
     {
         $document = $this->setAttr($document);
         $document = $this->addUpdated($document);
@@ -312,7 +311,7 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function inc(array $document, int $timeout = 30000): array
+    final public function inc(array $document, int $timeout = 10000): array
     {
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
@@ -348,7 +347,7 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function delete(string $id = null, int $timeout = 30000): array
+    final public function delete(string $id = null, int $timeout = 10000): array
     {
         if ($id) {
             $this->where('id', '=', $id);
