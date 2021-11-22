@@ -470,7 +470,13 @@ abstract class Model
         $filter = [];
         foreach ($conditions as $condition) {
             if ($this->objectId_field && in_array($condition[0], $this->objectId_field)) {
-                $condition[2] = $this->getObjectId($condition[2]);
+                if (is_array($condition[2])) {
+                    foreach ($condition[2] as $key => $item) {
+                        $condition[2][$key] = $this->getObjectId($item);
+                    }
+                } else {
+                    $condition[2] = $this->getObjectId($condition[2]);
+                }
             }
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
@@ -514,7 +520,13 @@ abstract class Model
         $filter = [];
         foreach ($conditions as $condition) {
             if ($this->objectId_field && in_array($condition[0], $this->objectId_field)) {
-                $condition[2] = $this->getObjectId($condition[2]);
+                if (is_array($condition[2])) {
+                    foreach ($condition[2] as $key => $item) {
+                        $condition[2][$key] = $this->getObjectId($item);
+                    }
+                } else {
+                    $condition[2] = $this->getObjectId($condition[2]);
+                }
             }
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
