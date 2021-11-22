@@ -23,9 +23,10 @@ function pp(...$arr)
 /**
  * 从请求头获取主id
  */
-function getMid(Hyperf\HttpServer\Contract\RequestInterface $request, string $master_pid = '0'): string
+function getMid(Hyperf\HttpServer\Contract\RequestInterface $request): string
 {
     $id = $request->getHeaderLine('payload-sub');
     $pid = $request->getHeaderLine('payload-pid');
-    return $pid == $master_pid ? $id : $pid;
+//    return $pid == $master_pid ? $id : $pid;
+    return !$pid ? $id : $pid;
 }
