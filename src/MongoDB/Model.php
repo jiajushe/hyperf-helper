@@ -4,7 +4,6 @@ namespace Jiajushe\HyperfHelper\MongoDB;
 
 
 use Hyperf\Contract\ConfigInterface;
-use Hyperf\Di\Annotation\Inject;
 use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Collection;
 use Hyperf\Utils\Str;
@@ -16,7 +15,7 @@ abstract class Model
 {
     protected ModelTask $modelTask;
 
-    protected function getModelTask()
+    protected function getModelTask(): ModelTask
     {
         if (!isset($this->modelTask)) {
             $this->modelTask = new ModelTask();
@@ -37,7 +36,7 @@ abstract class Model
     /**
      * @return array
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->config;
     }
@@ -188,8 +187,7 @@ abstract class Model
             $item = $this->setAttr($item);
             $document[$index] = $item;
         }
-        $document = $this->addTime($document);
-        return $document;
+        return $this->addTime($document);
     }
 
     final protected function addTime(array $document): array
@@ -312,8 +310,7 @@ abstract class Model
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
-        $document = $this->changeObjectId($document);
-        return $document;
+        return $this->changeObjectId($document);
     }
 
     /**
@@ -335,11 +332,10 @@ abstract class Model
         return $res;
     }
 
-    public function upsertDefaultHandle(array $default)
+    public function upsertDefaultHandle(array $default): array
     {
         $default[$this->created_at] = time();
-        $default = $this->changeObjectId($default);
-        return $default;
+        return $this->changeObjectId($default);
     }
 
     /**
@@ -363,6 +359,7 @@ abstract class Model
      * 自增减数据处理
      * @param array $document
      * @return array
+     * @throws CustomError
      */
     final public function incHandle(array $document): array
     {
