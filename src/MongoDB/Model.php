@@ -14,11 +14,15 @@ use MongoDB\Driver\Exception\Exception;
 
 abstract class Model
 {
-    /**
-     * @Inject
-     * @var ModelTask
-     */
     protected ModelTask $modelTask;
+
+    protected function getModelTask()
+    {
+        if (!isset($this->modelTask)) {
+            $this->modelTask = new ModelTask();
+        }
+        return $this->modelTask;
+    }
 
     /**
      * @var string  连接配置名称
@@ -120,7 +124,7 @@ abstract class Model
      * 重置查询表达式
      * @return $this
      */
-    final public function resetFilter(): Model
+    public function resetFilter(): Model
     {
         $this->filter = ['$and' => []];
         return $this;
@@ -154,12 +158,10 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function create(array $document, int $timeout = 10000): array
+    public function create(array $document, int $timeout = 10000): array
     {
-        $document = $this->changeObjectId($document);
-        $document = $this->setAttr($document);
-        $document = $this->addTime([$document]);
-        return $this->modelTask->insert($this->config, $document, $timeout);
+        $document = $this->insertHandle([$document]);
+        return $this->getModelTask()->insert($this->config, $document, $timeout);
     }
 
     /**
@@ -168,10 +170,10 @@ abstract class Model
      * @param int $timeout
      * @return array
      */
-    final public function insert(array $document, int $timeout = 10000): array
+    public function insert(array $document, int $timeout = 10000): array
     {
         $document = $this->insertHandle($document);
-        return $this->modelTask->insert($this->config, $document, $timeout);
+        return $this->getModelTask()->insert($this->config, $document, $timeout);
     }
 
     /**
@@ -179,11 +181,12 @@ abstract class Model
      * @param array $document
      * @return array
      */
-    final public function insertHandle(array $document): array
+    public function insertHandle(array $document): array
     {
         foreach ($document as $index => $item) {
-            $document[$index] = $this->changeObjectId($item);
-            $document[$index] = $this->setAttr($item);
+            $item = $this->changeObjectId($item);
+            $item = $this->setAttr($item);
+            $document[$index] = $item;
         }
         $document = $this->addTime($document);
         return $document;
@@ -211,13 +214,13 @@ abstract class Model
      * @return Collection
      * @throws Exception
      */
-    final public function all(): Collection
+    public function all(): Collection
     {
         $pipeline = $this->getPipeline();
         if ($pipeline) {
-            $res = $this->modelTask->aggregate($this->config, $pipeline);
+            $res = $this->getModelTask()->aggregate($this->config, $pipeline);
         } else {
-            $res = $this->modelTask->query($this->config, $this->getFilter(), $this->options);
+            $res = $this->getModelTask()->query($this->config, $this->getFilter(), $this->options);
         }
         $this->resetFilter();
         $this->resetOptions();
@@ -232,7 +235,7 @@ abstract class Model
      * @throws CustomError
      * @throws Exception
      */
-    final public function find(string $id = null)
+    public function find(string $id = null)
     {
         if ($id) {
             $this->where('id', '=', $id);
@@ -244,10 +247,10 @@ abstract class Model
                 $pipeline[] = ['$match' => $filter];
             }
             $pipeline[] = ['$limit' => 1];
-            $res = $this->modelTask->aggregate($this->config, $pipeline);
+            $res = $this->getModelTask()->aggregate($this->config, $pipeline);
         } else {
             $this->options[self::LIMIT_OPT] = 1;
-            $res = $this->modelTask->query($this->config, $filter, $this->options);
+            $res = $this->getModelTask()->query($this->config, $filter, $this->options);
         }
         $this->resetFilter();
         $this->resetPipeline();
@@ -262,7 +265,7 @@ abstract class Model
      * @return array
      * @throws Exception
      */
-    final public function paginate(int $page = 1, int $limit = 15): array
+    public function paginate(int $page = 1, int $limit = 15): array
     {
         $total = $this->count(false);
         $skip = ($page - 1) * $limit;
@@ -285,10 +288,10 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function update(array $document, int $timeout = 10000): array
+    public function update(array $document, int $timeout = 10000): array
     {
         $document = $this->updateHandle($document);
-        $res = $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
+        $res = $this->getModelTask()->update($this->config, $this->getFilter(), $document, $timeout);
         $this->resetOptions();
         $this->resetFilter();
         $this->resetPipeline();
@@ -321,18 +324,18 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function upsert(array $document, array $default = [], int $timeout = 10000): array
+    public function upsert(array $document, array $default = [], int $timeout = 10000): array
     {
         $document = $this->updateHandle($document);
         $default = $this->upsertDefaultHandle($default);
-        $res = $this->modelTask->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
+        $res = $this->getModelTask()->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
         $this->resetOptions();
         $this->resetFilter();
         $this->resetPipeline();
         return $res;
     }
 
-    final public function upsertDefaultHandle(array $default)
+    public function upsertDefaultHandle(array $default)
     {
         $default[$this->created_at] = time();
         $default = $this->changeObjectId($default);
@@ -346,10 +349,10 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function inc(array $document, int $timeout = 10000): array
+    public function inc(array $document, int $timeout = 10000): array
     {
         $document = $this->incHandle($document);
-        $res = $this->modelTask->inc($this->config, $this->getFilter(), $document, $timeout);
+        $res = $this->getModelTask()->inc($this->config, $this->getFilter(), $document, $timeout);
         $this->resetOptions();
         $this->resetFilter();
         $this->resetPipeline();
@@ -394,12 +397,12 @@ abstract class Model
      * @return array
      * @throws CustomError
      */
-    final public function delete(string $id = null, int $timeout = 10000): array
+    public function delete(string $id = null, int $timeout = 10000): array
     {
         if ($id) {
             $this->where('id', '=', $id);
         }
-        $res = $this->modelTask->delete($this->config, $this->getFilter(), $timeout);
+        $res = $this->getModelTask()->delete($this->config, $this->getFilter(), $timeout);
         $this->resetOptions();
         $this->resetFilter();
         $this->resetPipeline();
@@ -411,7 +414,7 @@ abstract class Model
      * @param bool $reset
      * @return int
      */
-    final public function count(bool $reset = true): int
+    public function count(bool $reset = true): int
     {
         if (!$this->options[self::LIMIT_OPT]) {
             unset($this->options[self::LIMIT_OPT]);
@@ -419,7 +422,7 @@ abstract class Model
         if (!$this->options[self::SKIP_OPT]) {
             unset($this->options[self::SKIP_OPT]);
         }
-        $res = $this->modelTask->count($this->config, $this->getFilter(), $this->options);
+        $res = $this->getModelTask()->count($this->config, $this->getFilter(), $this->options);
         if ($reset) {
             $this->resetFilter();
             $this->resetOptions();
@@ -734,7 +737,7 @@ abstract class Model
     /**
      * @return array
      */
-    final public function getFilter(): array
+    public function getFilter(): array
     {
         $filter = $this->filter;
         if (empty($filter['$and'])) {

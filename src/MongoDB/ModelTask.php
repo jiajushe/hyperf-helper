@@ -360,7 +360,7 @@ class ModelTask
                     $bulkWrite,
                     ['session' => $session]);
             }
-//            $session->commitTransaction();
+            $session->commitTransaction();
         } catch (Throwable $t) {
             $session->abortTransaction();
         }
