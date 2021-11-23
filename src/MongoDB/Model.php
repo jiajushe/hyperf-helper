@@ -363,7 +363,6 @@ abstract class Model
      */
     final public function incHandle(array $document): array
     {
-        $document = $this->addUpdated($document);
         if (isset($document['id'])) {
             $this->where('id', '=', $document['id']);
             unset($document['id']);
