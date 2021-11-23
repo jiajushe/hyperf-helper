@@ -31,6 +31,14 @@ abstract class Model
     protected array $config;
 
     /**
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
      * @var string  表名
      */
     protected string $collection;
@@ -162,12 +170,23 @@ abstract class Model
      */
     final public function insert(array $document, int $timeout = 10000): array
     {
+        $document = $this->insertHandle($document);
+        return $this->modelTask->insert($this->config, $document, $timeout);
+    }
+
+    /**
+     * 插入数据处理
+     * @param array $document
+     * @return array
+     */
+    final public function insertHandle(array $document): array
+    {
         foreach ($document as $index => $item) {
             $document[$index] = $this->changeObjectId($item);
             $document[$index] = $this->setAttr($item);
         }
         $document = $this->addTime($document);
-        return $this->modelTask->insert($this->config, $document, $timeout);
+        return $document;
     }
 
     final protected function addTime(array $document): array
@@ -268,6 +287,22 @@ abstract class Model
      */
     final public function update(array $document, int $timeout = 10000): array
     {
+        $document = $this->updateHandle($document);
+        $res = $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
+        $this->resetOptions();
+        $this->resetFilter();
+        $this->resetPipeline();
+        return $res;
+    }
+
+    /**
+     * 更新数据处理.
+     * @param array $document
+     * @return array
+     * @throws CustomError
+     */
+    final public function updateHandle(array $document): array
+    {
         $document = $this->setAttr($document);
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
@@ -275,10 +310,7 @@ abstract class Model
             unset($document['id']);
         }
         $document = $this->changeObjectId($document);
-        $res = $this->modelTask->update($this->config, $this->getFilter(), $document, $timeout);
-        $this->resetOptions();
-        $this->resetFilter();
-        return $res;
+        return $document;
     }
 
     /**
@@ -291,17 +323,20 @@ abstract class Model
      */
     final public function upsert(array $document, array $default = [], int $timeout = 10000): array
     {
-        $document = $this->setAttr($document);
-        $document = $this->addUpdated($document);
-        if (isset($document['id'])) {
-            $this->where('id', '=', $document['id']);
-            unset($document['id']);
-        }
-        $document = $this->changeObjectId($document);
+        $document = $this->updateHandle($document);
+        $default = $this->upsertDefaultHandle($default);
         $res = $this->modelTask->upsert($this->config, $this->getFilter(), $document, $default, $timeout);
         $this->resetOptions();
         $this->resetFilter();
+        $this->resetPipeline();
         return $res;
+    }
+
+    final public function upsertDefaultHandle(array $default)
+    {
+        $default[$this->created_at] = time();
+        $default = $this->changeObjectId($default);
+        return $default;
     }
 
     /**
@@ -313,15 +348,27 @@ abstract class Model
      */
     final public function inc(array $document, int $timeout = 10000): array
     {
+        $document = $this->incHandle($document);
+        $res = $this->modelTask->inc($this->config, $this->getFilter(), $document, $timeout);
+        $this->resetOptions();
+        $this->resetFilter();
+        $this->resetPipeline();
+        return $res;
+    }
+
+    /**
+     * 自增减数据处理
+     * @param array $document
+     * @return array
+     */
+    final public function incHandle(array $document): array
+    {
         $document = $this->addUpdated($document);
         if (isset($document['id'])) {
             $this->where('id', '=', $document['id']);
             unset($document['id']);
         }
-        $res = $this->modelTask->inc($this->config, $this->getFilter(), $document, $timeout);
-        $this->resetOptions();
-        $this->resetFilter();
-        return $res;
+        return $document;
     }
 
     /**
@@ -355,6 +402,7 @@ abstract class Model
         $res = $this->modelTask->delete($this->config, $this->getFilter(), $timeout);
         $this->resetOptions();
         $this->resetFilter();
+        $this->resetPipeline();
         return $res;
     }
 

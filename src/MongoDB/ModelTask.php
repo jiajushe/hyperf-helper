@@ -15,6 +15,7 @@ use MongoDB\Driver\ReadPreference;
 use MongoDB\Driver\WriteConcern;
 use MongoDB\Driver\ReadConcern;
 use stdClass;
+use Throwable;
 
 class ModelTask
 {
@@ -94,7 +95,6 @@ class ModelTask
         foreach ($document as $row) {
             $bulkWrite->insert($row);
         }
-
         $res = $this->manager($config)->executeBulkWrite(
             $this->namespace($config),
             $bulkWrite,
@@ -310,5 +310,60 @@ class ModelTask
                 }
             }
         });
+    }
+
+    /**
+     * 事务写操作
+     * @Task (timeout=30)
+     */
+    public function transaction(array $data)
+    {
+        $manager = $this->manager($data[0]['config']);
+        $session = $manager->startSession([
+            'causalConsistency' => true,
+            'defaultTransactionOptions' => [
+                'maxCommitTimeMS' => 10000,
+                'writeConcern' => $this->writeConcern(10000),
+            ],
+        ]);
+        $session->startTransaction();
+        try {
+            foreach ($data as $item) {
+                $bulkWrite = $this->bulkWrite();
+                switch ($item['write']) {
+                    case 'insert':
+                        foreach ($item['document'] as $row) {
+                            $bulkWrite->insert($row);
+                        }
+                        break;
+                    case 'update':
+                        $bulkWrite->update($item['filter'],
+                            ['$set' => $item['document']],
+                            ['multi' => true, 'upsert' => false]);
+                        break;
+                    case 'upsert':
+                        $new = ['$set' => $item['document']];
+                        if ($item['default']) {
+                            $new['$setOnInsert'] = $item['default'];
+                        }
+                        $bulkWrite->update($item['filter'], $new, ['multi' => true, 'upsert' => true]);
+                        break;
+                    case 'inc':
+                        $bulkWrite->update($item['filter'], ['$inc' => $item['document']], ['multi' => true, 'upsert' => false]);
+                        break;
+                    case 'delete':
+                        $bulkWrite->delete($item['filter']);
+                        break;
+                }
+                $manager->executeBulkWrite(
+                    $this->namespace($item['config']),
+                    $bulkWrite,
+                    ['session' => $session]);
+            }
+//            $session->commitTransaction();
+        } catch (Throwable $t) {
+            $session->abortTransaction();
+        }
+
     }
 }
