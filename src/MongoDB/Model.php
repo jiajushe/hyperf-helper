@@ -267,6 +267,7 @@ abstract class Model
     {
         $total = $this->count(false);
         $skip = ($page - 1) * $limit;
+        $limit = $limit <= 0 ? 15 : $limit;
         $total_page = (int)ceil($total / $limit);
         $this->skip($skip)->limit($limit);
         $data = $this->limit($limit)->skip($skip)->all();
