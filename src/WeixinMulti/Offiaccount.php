@@ -154,11 +154,31 @@ class Offiaccount
     }
 
     /**
+     * 获取分享配置.
+     * @param string $url
+     * @return array
+     * @throws CustomError
+     */
+    public function shareConfig(string $url): array
+    {
+        $noncestr = WeixinMulti::createNonceStr();
+        $timestamp = time();
+        $str = 'jsapi_ticket=' . $this->jsapiTicket() . '&noncestr=' . $noncestr . '&timestamp=' . $timestamp . '&url=' . $url;
+        $signature = sha1($str);
+        return [
+            'signature' => $signature,
+            'timestamp' => $timestamp,
+            'noncestr' => $noncestr,
+            'appId' => $this->appid,
+        ];
+    }
+
+    /**
      * 获取　jsapi_ticket
      * @return string
      * @throws CustomError
      */
-    public function jsapiTicket(): string
+    protected function jsapiTicket(): string
     {
         $redis_prefix = $this->getRedisPrefix() . 'JSAPI_TICKET:' . $this->appid;
         $redis = Common::getRedis();

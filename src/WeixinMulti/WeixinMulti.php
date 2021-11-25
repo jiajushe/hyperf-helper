@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @contact
  * @license
  */
+
 namespace Jiajushe\HyperfHelper\WeixinMulti;
 
 use stdClass;
@@ -33,5 +34,17 @@ class WeixinMulti
         return new Offiaccount($this->config->offiaccount_appid, $this->config->offiaccount_secret);
     }
 
-
+    /**
+     * @param int $length
+     * @return string
+     */
+    public static function createNonceStr(int $length = 16): string
+    {
+        $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        $str = "";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+        }
+        return $str;
+    }
 }
