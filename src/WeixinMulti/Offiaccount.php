@@ -25,6 +25,7 @@ class Offiaccount
     public const URI_AUTH_ACCESS_TOKEN = 'https://api.weixin.qq.com/sns/oauth2/access_token';//网页授权
     public const URI_AUTH_USERINFO = 'https://api.weixin.qq.com/sns/userinfo';//网页授权
     public const URI_MESSAGE_TEMPLATE = 'https://api.weixin.qq.com/cgi-bin/message/template/send';//发送模板消息
+    public const URI_JSAPI_TICKET = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket';//获得jsapi_ticket
 
     protected string $appid;
 
@@ -150,5 +151,32 @@ class Offiaccount
             throw new CustomError('发送失败');
         }
         return true;
+    }
+
+    /**
+     * 获取　jsapi_ticket
+     * @return string
+     * @throws CustomError
+     */
+    public function jsapiTicket(): string
+    {
+        $redis_prefix = $this->getRedisPrefix() . 'JSAPI_TICKET:' . $this->appid;
+        $redis = Common::getRedis();
+        if ($jsapi_ticket = $redis->get($redis_prefix)) {
+            return $jsapi_ticket;
+        }
+        $method = 'get';
+        $query = [
+            'access_token' => $this->getAccessToken(),
+            'type' => 'jsapi',
+        ];
+        $guzzleHelper = new GuzzleHelper();
+        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_JSAPI_TICKET, $query));
+        if ($res['errcode'] != 0) {
+            (new WeixinErrorLog())->log($this->appid, $method, self::URI_JSAPI_TICKET, $query, $res);
+            throw new CustomError('发送失败');
+        }
+        $redis->set($redis_prefix, $res['ticket'], ($res['expires_in'] - 600));
+        return $res['ticket'];
     }
 }
