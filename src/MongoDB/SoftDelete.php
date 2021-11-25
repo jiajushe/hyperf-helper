@@ -86,7 +86,9 @@ trait SoftDelete
 
     public function getOptions(): array
     {
-        $this->select([$this->deleted_at], false);
+        if (empty($this->options[self::PROJECTION_OPT])) {
+            $this->select([$this->deleted_at], false);
+        }
         return $this->options;
     }
 
