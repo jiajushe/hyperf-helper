@@ -218,7 +218,7 @@ abstract class Model
         if ($pipeline) {
             $res = $this->getModelTask()->aggregate($this->config, $pipeline);
         } else {
-            $res = $this->getModelTask()->query($this->config, $this->getFilter(), $this->options);
+            $res = $this->getModelTask()->query($this->config, $this->getFilter(), $this->getOptions());
         }
         $this->resetFilter();
         $this->resetOptions();
@@ -248,7 +248,7 @@ abstract class Model
             $res = $this->getModelTask()->aggregate($this->config, $pipeline);
         } else {
             $this->options[self::LIMIT_OPT] = 1;
-            $res = $this->getModelTask()->query($this->config, $filter, $this->options);
+            $res = $this->getModelTask()->query($this->config, $filter, $this->getOptions());
         }
         $this->resetFilter();
         $this->resetPipeline();
@@ -419,7 +419,7 @@ abstract class Model
         if (!$this->options[self::SKIP_OPT]) {
             unset($this->options[self::SKIP_OPT]);
         }
-        $res = $this->getModelTask()->count($this->config, $this->getFilter(), $this->options);
+        $res = $this->getModelTask()->count($this->config, $this->getFilter(), $this->getOptions());
         if ($reset) {
             $this->resetFilter();
             $this->resetOptions();
@@ -746,7 +746,7 @@ abstract class Model
     /**
      * @return array|int[]
      */
-    final public function getOptions(): array
+    public function getOptions(): array
     {
         return $this->options;
     }

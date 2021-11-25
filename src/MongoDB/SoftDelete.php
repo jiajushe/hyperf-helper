@@ -83,6 +83,13 @@ trait SoftDelete
         return $res;
     }
 
+
+    public function getOptions(): array
+    {
+        $this->select([$this->deleted_at], false);
+        return $this->options;
+    }
+
     public function onlyTrashed(): Model
     {
         $this->only_trashed = true;
