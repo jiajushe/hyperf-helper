@@ -467,17 +467,11 @@ abstract class Model
             return $this;
         }
         if ($this->objectId_field && in_array($field, $this->objectId_field)) {
-            if (is_array($value)) {
-                foreach ($value as $key => $item) {
-                    $value[$key] = $this->getObjectId($item);
-                }
-            } else {
-                $value = $this->getObjectId($value);
-            }
+            $value = $this->changeObjectIdForFilter($value);
         }
         if ($field === 'id') {
             $field = '_id';
-            $value = $this->getObjectId($value);
+            $value = $this->changeObjectIdForFilter($value);
         }
         if (!empty(self::OPERATORS[$operator])) {
             if ($operator === 'between') {
@@ -517,17 +511,11 @@ abstract class Model
         $filter = [];
         foreach ($conditions as $condition) {
             if ($this->objectId_field && in_array($condition[0], $this->objectId_field)) {
-                if (is_array($condition[2])) {
-                    foreach ($condition[2] as $key => $item) {
-                        $condition[2][$key] = $this->getObjectId($item);
-                    }
-                } else {
-                    $condition[2] = $this->getObjectId($condition[2]);
-                }
+                $condition[2] = $this->changeObjectIdForFilter($condition[2]);
             }
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
-                $condition[2] = $this->getObjectId($condition[2]);
+                $condition[2] = $this->changeObjectIdForFilter($condition[2]);
             }
             if ($condition[1] === 'between') {
                 if (!is_array($condition[2])) {
@@ -567,17 +555,11 @@ abstract class Model
         $filter = [];
         foreach ($conditions as $condition) {
             if ($this->objectId_field && in_array($condition[0], $this->objectId_field)) {
-                if (is_array($condition[2])) {
-                    foreach ($condition[2] as $key => $item) {
-                        $condition[2][$key] = $this->getObjectId($item);
-                    }
-                } else {
-                    $condition[2] = $this->getObjectId($condition[2]);
-                }
+                $condition[2] = $this->changeObjectIdForFilter($condition[2]);
             }
             if ($condition[0] === 'id') {
                 $condition[0] = '_id';
-                $condition[2] = $this->getObjectId($condition[2]);
+                $condition[2] = $this->changeObjectIdForFilter($condition[2]);
             }
             if ($condition[1] === 'between') {
                 if (!is_array($condition[2])) {
@@ -789,6 +771,18 @@ abstract class Model
         return $document;
     }
 
+    final protected function changeObjectIdForFilter($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as $key => $item) {
+                $value[$key] = $this->getObjectId($item);
+            }
+        } else {
+            $value = $this->getObjectId($value);
+        }
+        return $value;
+    }
+
     final protected function idTo_id(string $field): string
     {
         if ($field == 'id') {
@@ -897,4 +891,6 @@ abstract class Model
     {
         return new ObjectId($value);
     }
+
+
 }
