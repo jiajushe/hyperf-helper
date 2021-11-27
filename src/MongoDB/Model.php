@@ -215,7 +215,11 @@ abstract class Model
     public function all(): Collection
     {
         $pipeline = $this->getPipeline();
+        $filter = $this->getFilter();
         if ($pipeline) {
+            if ($filter) {
+                $pipeline[] = ['$match' => $filter];
+            }
             $res = $this->getModelTask()->aggregate($this->config, $pipeline);
         } else {
             $res = $this->getModelTask()->query($this->config, $this->getFilter(), $this->getOptions());
