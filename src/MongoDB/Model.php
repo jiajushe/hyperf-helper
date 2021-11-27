@@ -335,7 +335,9 @@ abstract class Model
 
     public function upsertDefaultHandle(array $default): array
     {
-        $default[$this->created_at] = time();
+        if ($this->created_at) {
+            $default[$this->created_at] = time();
+        }
         return $this->changeObjectId($default);
     }
 
