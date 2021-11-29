@@ -11,6 +11,7 @@ services:
       - ${VOLUMES_PHP_CONFIG_PATH:-/server/docker-volumes/hyperf-server-test/config/php}:/server/config/php
       - ${VOLUMES_SUPERVISOR_CONF_PATH:-/server/docker-volumes/hyperf-server-test/config/supervisor}:/etc/supervisor/conf.d
       - ${VOLUMES_SUPERVISOR_LOGS_PATH:-/server/docker-volumes/hyperf-server-test/data/supervisor/logs}:/server/data/supervisor/logs
+      - ${VOLUMES_HYPERF_PATH:-/saas/hyperf-server-test}:/server/hyperf
     networks:
       - home-club
 networks:
