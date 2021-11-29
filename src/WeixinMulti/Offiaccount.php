@@ -161,6 +161,7 @@ class Offiaccount
      */
     public function shareConfig(string $url): array
     {
+        $url = urldecode($url);
         $noncestr = WeixinMulti::createNonceStr();
         $timestamp = time();
         $str = 'jsapi_ticket=' . $this->jsapiTicket() . '&noncestr=' . $noncestr . '&timestamp=' . $timestamp . '&url=' . $url;
