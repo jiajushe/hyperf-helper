@@ -17,7 +17,9 @@
         "hyperf/task": "~2.2.0",
         "hyperf/utils": "~2.2.0",
         "hyperf/validation": "~2.2.7",
-        "mongodb/mongodb": "~1.9.0"
+        "mongodb/mongodb": "~1.9.0",
+        "ext-openssl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "hyperf/ide-helper": ">=2.2",

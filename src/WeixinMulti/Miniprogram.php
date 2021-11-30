@@ -38,7 +38,14 @@ class Miniprogram
         return Common::REDIS_PREFIX . 'MINIPROGRAM:';
     }
 
-    public function decryptData(string $code, string $encrypted_data, string $iv, string $session_key):array
+    /**
+     * @param string $encrypted_data
+     * @param string $iv
+     * @param string $session_key
+     * @return array
+     * @throws CustomError
+     */
+    public function decryptData(string $encrypted_data, string $iv, string $session_key):array
     {
         $aesKey = base64_decode($session_key);
         if (strlen($iv) != 24) {
@@ -61,10 +68,9 @@ class Miniprogram
     }
 
     /**
-     * @return string
-     * @throws ContainerExceptionInterface
+     * @param string $js_code
+     * @return array
      * @throws CustomError
-     * @throws NotFoundExceptionInterface
      */
     public function code2Session(string $js_code): array
     {
@@ -88,4 +94,6 @@ class Miniprogram
         }
         return $res;
     }
+
+
 }

@@ -21,7 +21,6 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class Offiaccount
 {
-    public const URI_ACCESS_TOKEN = 'https://api.weixin.qq.com/cgi-bin/token';//获取access_token
     public const URI_AUTH_ACCESS_TOKEN = 'https://api.weixin.qq.com/sns/oauth2/access_token';//网页授权
     public const URI_AUTH_USERINFO = 'https://api.weixin.qq.com/sns/userinfo';//网页授权
     public const URI_MESSAGE_TEMPLATE = 'https://api.weixin.qq.com/cgi-bin/message/template/send';//发送模板消息
@@ -40,35 +39,6 @@ class Offiaccount
     public function getRedisPrefix(): string
     {
         return Common::REDIS_PREFIX . 'OFFIACCOUNT:';
-    }
-
-    /**
-     * @return string
-     * @throws ContainerExceptionInterface
-     * @throws CustomError
-     * @throws NotFoundExceptionInterface
-     */
-    protected function getAccessToken(): string
-    {
-        $redis_prefix = $this->getRedisPrefix() . 'ACCOUNT_TOKEN:' . $this->appid;
-        $redis = Common::getRedis();
-        if ($access_token = $redis->get($redis_prefix)) {
-            return $access_token;
-        }
-        $method = 'get';
-        $query = [
-            'appid' => $this->appid,
-            'secret' => $this->secret,
-            'grant_type' => 'client_credential',
-        ];
-        $guzzleHelper = new GuzzleHelper();
-        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_ACCESS_TOKEN, $query));
-        if (isset($res['errcode'])) {
-            (new WeixinErrorLog())->log($this->appid, $method, self::URI_AUTH_ACCESS_TOKEN, $query, $res);
-            throw new CustomError('获取access_token失败');
-        }
-        $redis->set($redis_prefix, $res['access_token'], ($res['expires_in'] - 600));
-        return $res['access_token'];
     }
 
     /**
@@ -139,7 +109,7 @@ class Offiaccount
     {
         $method = 'post';
         $query = [
-            'access_token' => $this->getAccessToken(),
+            'access_token' => Common::getAccessToken($this->appid, $this->secret),
         ];
         $options = [
             'json' => $data,
@@ -162,7 +132,7 @@ class Offiaccount
     public function shareConfig(string $url): array
     {
         $url = urldecode($url);
-        $noncestr = WeixinMulti::createNonceStr();
+        $noncestr = Common::createNonceStr();
         $timestamp = time();
         $str = 'jsapi_ticket=' . $this->jsapiTicket() . '&noncestr=' . $noncestr . '&timestamp=' . $timestamp . '&url=' . $url;
         $signature = sha1($str);
@@ -188,7 +158,7 @@ class Offiaccount
         }
         $method = 'get';
         $query = [
-            'access_token' => $this->getAccessToken(),
+            'access_token' => Common::getAccessToken($this->appid, $this->secret),
             'type' => 'jsapi',
         ];
         $guzzleHelper = new GuzzleHelper();
