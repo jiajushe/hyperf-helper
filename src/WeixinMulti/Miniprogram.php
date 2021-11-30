@@ -55,14 +55,14 @@ class Miniprogram
         $aesCipher = base64_decode($encrypted_data);
         $result = openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
         if (!$result) {
-            throw new CustomError('aes 解密失败');
+            throw new CustomError('aes 解密失败:1');
         }
         $dataObj = json_decode($result);
         if ($dataObj == NULL) {
-            throw new CustomError('aes 解密失败');
+            throw new CustomError('aes 解密失败:2');
         }
         if ($dataObj->watermark->appid != $this->appid) {
-            throw new CustomError('aes 解密失败');
+            throw new CustomError('aes 解密失败:3');
         }
         return (array)$dataObj;
     }
