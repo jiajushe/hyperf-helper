@@ -13,79 +13,38 @@ declare(strict_types=1);
 namespace Jiajushe\HyperfHelper\WeixinMulti;
 
 use Jiajushe\HyperfHelper\Exception\CustomError;
-use Jiajushe\HyperfHelper\Exception\CustomNormal;
-use Jiajushe\HyperfHelper\Helper\GuzzleHelper;
-use Jiajushe\HyperfHelper\MongoDB\WeixinErrorLog;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use stdClass;
 
-class Miniprogram
+class WeixinMulti
 {
-    public const URI_CODE_TO_SESSION = 'https://api.weixin.qq.com/sns/jscode2session';//code2Session
 
-    protected string $appid;
+    protected stdClass $config;
 
-    protected string $secret;
-
-    public function __construct(string $appid, string $secret)
+    public function __construct(string $master_id, string $model)
     {
-        $this->appid = $appid;
-        $this->secret = $secret;
-    }
-
-    public function getRedisPrefix(): string
-    {
-        return Common::REDIS_PREFIX . 'MINIPROGRAM:';
-    }
-
-    public function decryptData(string $code, string $encrypted_data, string $iv, string $session_key):array
-    {
-        $aesKey = base64_decode($session_key);
-        if (strlen($iv) != 24) {
-            throw new CustomError('非法iv');
+        $weixinConfig = new $model();
+        $config = $weixinConfig->where('master_id', '=', $master_id)->find();
+        if (!$config) {
+            throw new CustomError('未配置微信');
         }
-        $aesIV = base64_decode($iv);
-        $aesCipher = base64_decode($encrypted_data);
-        $result = openssl_decrypt($aesCipher, "AES-128-CBC", $aesKey, 1, $aesIV);
-        if (!$result) {
-            throw new CustomError('aes 解密失败');
-        }
-        $dataObj = json_decode($result);
-        if ($dataObj == NULL) {
-            throw new CustomError('aes 解密失败');
-        }
-        if ($dataObj->watermark->appid != $this->appid) {
-            throw new CustomError('aes 解密失败');
-        }
-        return (array)$dataObj;
+        $this->config = $config;
     }
 
     /**
-     * @return string
-     * @throws ContainerExceptionInterface
-     * @throws CustomError
-     * @throws NotFoundExceptionInterface
+     * 返回微信公众号操作对象.
+     * @return Offiaccount
      */
-    public function code2Session(string $js_code): array
+    public function offiaccount(): Offiaccount
     {
-        $method = 'get';
-        $query = [
-            'appid' => $this->appid,
-            'secret' => $this->secret,
-            'js_code' => $js_code,
-            'grant_type' => 'authorization_code',
-        ];
-        $guzzleHelper = new GuzzleHelper();
-        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_CODE_TO_SESSION, $query));
-        $weixinErrorLogModel = new WeixinErrorLog();
-        if (isset($res['errcode'])) {
-            $weixinErrorLogModel->log($this->appid, $method, self::URI_CODE_TO_SESSION, $query, $res);
-            throw new CustomError('获取session失败');
-        }
-        if (strlen($res['session_key']) != 24) {
-            $weixinErrorLogModel->log($this->appid, $method, self::URI_CODE_TO_SESSION, $query, $res);
-            throw new CustomError('获取session失败');
-        }
-        return $res;
+        return new Offiaccount($this->config->offiaccount_appid, $this->config->offiaccount_secret);
+    }
+
+    /**
+     * 返回微信小程序操作对象.
+     * @return Miniprogram
+     */
+    public function miniprogram(): Miniprogram
+    {
+        return new Miniprogram($this->config->miniprogram_appid, $this->config->miniprogram_secret);
     }
 }
