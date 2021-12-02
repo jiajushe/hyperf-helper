@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license
  */
 
-namespace Jiajushe\HyperfHelper\WeixinMulti;
+namespace Jiajushe\HyperfHelper\Weixin;
 
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;
@@ -26,6 +26,8 @@ class Miniprogram
     protected string $appid;
 
     protected string $secret;
+
+    protected const WEIXIN_TYPE = 'MINIPROGRAM';
 
     public function __construct(string $appid, string $secret)
     {
@@ -81,18 +83,7 @@ class Miniprogram
             'js_code' => $js_code,
             'grant_type' => 'authorization_code',
         ];
-        $guzzleHelper = new GuzzleHelper();
-        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_CODE_TO_SESSION, $query));
-        $weixinErrorLogModel = new WeixinErrorLog();
-        if (isset($res['errcode'])) {
-            $weixinErrorLogModel->log($this->appid, $method, self::URI_CODE_TO_SESSION, $query, $res);
-            throw new CustomError('获取session失败');
-        }
-        if (strlen($res['session_key']) != 24) {
-            $weixinErrorLogModel->log($this->appid, $method, self::URI_CODE_TO_SESSION, $query, $res);
-            throw new CustomError('获取session失败');
-        }
-        return $res;
+        return Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_CODE_TO_SESSION, $query);
     }
 
 

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license
  */
 
-namespace Jiajushe\HyperfHelper\WeixinMulti;
+namespace Jiajushe\HyperfHelper\Weixin;
 
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;
@@ -30,6 +30,8 @@ class Offiaccount
 
     protected string $secret;
 
+    protected const WEIXIN_TYPE = 'OFFIACCOUNT';
+
     public function __construct(string $appid, string $secret)
     {
         $this->appid = $appid;
@@ -38,17 +40,17 @@ class Offiaccount
 
     public function getRedisPrefix(): string
     {
-        return Common::REDIS_PREFIX . 'OFFIACCOUNT:';
+        return Common::REDIS_PREFIX . self::WEIXIN_TYPE . ':';
     }
 
     /**
      * 公众号网页授权.
+     * @param string $code
+     * @return array
      * @throws CustomError
-     * @throws CustomNormal
      */
     public function auth(string $code): array
     {
-        $guzzleHelper = new GuzzleHelper();
         $query = [
             'appid' => $this->appid,
             'secret' => $this->secret,
@@ -56,24 +58,13 @@ class Offiaccount
             'grant_type' => 'authorization_code',
         ];
         $method = 'get';
-        $res = $guzzleHelper->request($method, self::URI_AUTH_ACCESS_TOKEN, $query);
-        $res = $guzzleHelper->getResponse($res);
-        if (isset($res['errcode'])) {
-            (new WeixinErrorLog())->log($this->appid, $method, self::URI_AUTH_ACCESS_TOKEN, $query, $res);
-            throw new CustomNormal('微信授权失败');
-        }
+        $res = Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_AUTH_ACCESS_TOKEN, $query);
         $query = [
             'access_token' => $res['access_token'],
             'openid' => $res['openid'],
             'lang' => 'zh_CN',
         ];
-        $userinfo = $guzzleHelper->request($method, self::URI_AUTH_USERINFO, $query);
-        $userinfo = $guzzleHelper->getResponse($userinfo);
-        if (isset($userinfo['errcode'])) {
-            (new WeixinErrorLog())->log($this->appid, $method, self::URI_AUTH_USERINFO, $query, $userinfo);
-            throw new CustomNormal('微信授权失败');
-        }
-        return $userinfo;
+        return Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_AUTH_USERINFO, $query);
     }
 
     /**
@@ -109,17 +100,12 @@ class Offiaccount
     {
         $method = 'post';
         $query = [
-            'access_token' => Common::getAccessToken($this->appid, $this->secret),
+            'access_token' => Common::getAccessToken($this->appid, $this->secret, self::WEIXIN_TYPE),
         ];
         $options = [
             'json' => $data,
         ];
-        $guzzleHelper = new GuzzleHelper();
-        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_MESSAGE_TEMPLATE, $query, $options));
-        if ($res['errcode'] != 0) {
-            (new WeixinErrorLog())->log($this->appid, $method, self::URI_MESSAGE_TEMPLATE, $data, $res);
-            throw new CustomError('发送失败');
-        }
+        Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_MESSAGE_TEMPLATE, $query, $options);
         return true;
     }
 
@@ -158,15 +144,10 @@ class Offiaccount
         }
         $method = 'get';
         $query = [
-            'access_token' => Common::getAccessToken($this->appid, $this->secret),
+            'access_token' => Common::getAccessToken($this->appid, $this->secret, self::WEIXIN_TYPE),
             'type' => 'jsapi',
         ];
-        $guzzleHelper = new GuzzleHelper();
-        $res = $guzzleHelper->getResponse($guzzleHelper->request($method, self::URI_JSAPI_TICKET, $query));
-        if ($res['errcode'] != 0) {
-            (new WeixinErrorLog())->log($this->appid, $method, self::URI_JSAPI_TICKET, $query, $res);
-            throw new CustomError('发送失败');
-        }
+        $res = Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_JSAPI_TICKET, $query);
         $redis->set($redis_prefix, $res['ticket'], ($res['expires_in'] - 600));
         return $res['ticket'];
     }

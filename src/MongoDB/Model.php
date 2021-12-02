@@ -639,6 +639,20 @@ abstract class Model
     }
 
     /**
+     * for aggregate
+     * 多种写法，要查文档
+     * @param $unwind
+     * @return $this
+     */
+    final public function unwind($unwind): Model
+    {
+        $pipeline = $this->pipeline;
+        $pipeline[] = ['$unwind' => $unwind];
+        $this->pipeline = $pipeline;
+        return $this;
+    }
+
+    /**
      * for aggregate　选择字段
      * ['filed1'=>1,'filed2'=>0]
      */

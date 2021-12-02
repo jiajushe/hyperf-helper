@@ -10,27 +10,26 @@ use InvalidArgumentException;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;
 use Throwable;
-use stdClass;
 use UnexpectedValueException;
 
 class TokenWeixin
 {
     /**
      * 生成token
-     * @param string $master_id
-     * @param string $openid
+     * @param string $appid
+     * @param string $sub
      * @param string $weixin
      * @return string
      * @throws CustomError
      */
-    public function make(string $master_id, string $openid, string $weixin): string
+    public function make(string $appid, string $sub, string $weixin): string
     {
         try {
             $config = config('jwt');
             $time = time();
             $payload = [
-                'iss' => $master_id,    //运营id
-                'sub' => $openid, //用户openid
+                'iss' => $appid,    //appid
+                'sub' => $sub, //用户id
                 'exp' => $time + $config['expire_second'], //过期时间
                 'refresh' => $config['refresh_second'], //刷新时间
                 'nbf' => $time, //某个时间点后才能访问
