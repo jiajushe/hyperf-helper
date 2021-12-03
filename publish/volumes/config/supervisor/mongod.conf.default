@@ -1,5 +1,5 @@
 [program:mongod]
-command=mongod -f /server/config/mongodb/mongodb_noauth.conf
+command=mongod -f /server/config/mongodb/mongodb_noauth.conf.default
 directory=/
 autorestart=true
 startsecs=3

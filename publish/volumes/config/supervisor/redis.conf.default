@@ -1,0 +1,13 @@
+[program:redis-server]
+command=redis-server /server/config/redis/redis.conf
+directory=/
+autorestart=true
+startsecs=3
+startretries=3
+stdout_logfile=/server/data/supervisor/logs/redis.out.log
+stderr_logfile=/server/data/supervisor/logs/redis.err.log
+stdout_logfile_maxbytes=2MB
+stderr_logfile_maxbytes=2MB
+user=root
+priority=999
+numprocs=1
