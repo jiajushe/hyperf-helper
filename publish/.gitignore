@@ -11,9 +11,9 @@ vendor/
 .DS_Store
 .phpunit*
 *.cache
-/volumes/config/mongodb/mongodb.conf.default
-/volumes/config/mongodb/mongodb_auth.js.default
-/volumes/config/mongodb/mongodb_noauth.conf.default
+/volumes/config/mongodb/mongodb.conf
+/volumes/config/mongodb/mongodb_auth.js
+/volumes/config/mongodb/mongodb_noauth.conf
 /volumes/config/php/php.ini
 /volumes/config/supervisor/mongod.conf
 /config/autoload/helper_function.php
