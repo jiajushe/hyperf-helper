@@ -18,7 +18,7 @@ cp ./volumes/config/mongodb/mongodb_noauth.conf.default ./volumes/config/mongodb
 
 创建mongodb管理员脚本
 
-cp ./volumes/config/mongodb/mongodb_auth.js.default.default ./volumes/config/mongodb/mongodb_auth.js.default
+cp ./volumes/config/mongodb/mongodb_auth.js.default ./volumes/config/mongodb/mongodb_auth.js
 
 ***********************************************************************************
 
@@ -26,7 +26,7 @@ cp ./volumes/config/mongodb/mongodb_auth.js.default.default ./volumes/config/mon
 
 cp ./volumes/config/supervisor/mongod.conf.default ./volumes/config/supervisor/mongod.conf
 
-cp ./volumes/config/supervisor/mongod.conf.default ./volumes/config/supervisor/redis.conf
+cp ./volumes/config/supervisor/redis.conf.default ./volumes/config/supervisor/redis.conf
 
 ***********************************************************************
 
@@ -90,6 +90,7 @@ docker run --name swoole-mongodb-redis -it --network home-club \
 -v /server/docker-volumes/swoole-mongodb-redis/data/redis:/server/data/redis \
 -v /server/docker-volumes/swoole-mongodb-redis/config:/server/config \
 -v /server/docker-volumes/swoole-mongodb-redis/config/supervisor:/etc/supervisor/conf.d \
+-v /home/smart/my_project/saas/server/swoole-mongodb-redis:/server/hyperf \
 -p 27030:27017 \
 -p 6379:6379 \
 swoole-mongodb-redis \
