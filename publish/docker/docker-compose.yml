@@ -5,6 +5,7 @@ services:
     build: .
     image: ${IMAGE_NAME:-swoole-mongodb-redis}
     volumes:
+      - ${VOLUMES_HYPERF_PATH:-/saas/swoole-mongodb-redis}:/server/hyperf
       - ${VOLUMES_MONGODB_DATABASES_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/mongodb/databases}:/server/data/mongodb/databases
       - ${VOLUMES_MONGODB_LOGS_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/mongodb/logs}:/server/data/mongodb/logs
       - ${VOLUMES_SUPERVISOR_LOGS_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/supervisor/logs}:/server/data/supervisor/logs
