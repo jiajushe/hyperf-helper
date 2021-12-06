@@ -74,6 +74,9 @@ abstract class Model
      */
     protected array $pipeline = [];
 
+    /**
+     * @var array objectId　字段数组
+     */
     protected array $objectId_field = [];
 
     protected const PROJECTION_OPT = 'projection';
@@ -273,8 +276,20 @@ abstract class Model
         $skip = ($page - 1) * $limit;
         $limit = $limit <= 0 ? 15 : $limit;
         $total_page = (int)ceil($total / $limit);
-        $this->skip($skip)->limit($limit);
-        $data = $this->limit($limit)->skip($skip)->all();
+
+        $pipeline = $this->getPipeline();
+        $filter = $this->getFilter();
+        if ($pipeline) {
+            if ($filter) {
+                $pipeline[] = ['$match' => $filter];
+            }
+            $pipeline[] = ['$skip' => $skip];
+            $pipeline[] = ['$limit' => $limit];
+            $data = $this->getModelTask()->aggregate($this->config, $pipeline);
+        } else {
+            $this->skip($skip)->limit($limit);
+            $data = $this->limit($limit)->skip($skip)->all();
+        }
         return [
             'total' => $total,
             'total_page' => $total_page,
