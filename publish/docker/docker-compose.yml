@@ -1,17 +1,17 @@
 version: "3.8"
 services:
-  swoole-mongodb-redis:
-    container_name: ${CONTAINER_NAME:-swoole-mongodb-redis}
+  CONTAINER_NAME:
+    container_name: ${CONTAINER_NAME:-CONTAINER_NAME}
     build: .
     image: ${IMAGE_NAME:-swoole-mongodb-redis}
     volumes:
-      - ${VOLUMES_HYPERF_PATH:-/saas/swoole-mongodb-redis}:/server/hyperf
-      - ${VOLUMES_MONGODB_DATABASES_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/mongodb/databases}:/server/data/mongodb/databases
-      - ${VOLUMES_MONGODB_LOGS_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/mongodb/logs}:/server/data/mongodb/logs
-      - ${VOLUMES_SUPERVISOR_LOGS_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/supervisor/logs}:/server/data/supervisor/logs
-      - ${VOLUMES_REDIS_DATE_PATH:-/server/docker-volumes/swoole-mongodb-redis/data/redis}:/server/data/redis
-      - ${VOLUMES_CONFIG_PATH:-/server/docker-volumes/swoole-mongodb-redis/config}:/server/config
-      - ${VOLUMES_CONFIG_SUPERVISOR_PATH:-/server/docker-volumes/swoole-mongodb-redis/config/supervisor}:/etc/supervisor/conf.d
+      - ${VOLUMES_HYPERF_PATH:-/saas/CONTAINER_NAME}:/server/hyperf
+      - ${VOLUMES_MONGODB_DATABASES_PATH:-/server/docker-volumes/CONTAINER_NAME/data/mongodb/databases}:/server/data/mongodb/databases
+      - ${VOLUMES_MONGODB_LOGS_PATH:-/server/docker-volumes/CONTAINER_NAME/data/mongodb/logs}:/server/data/mongodb/logs
+      - ${VOLUMES_SUPERVISOR_LOGS_PATH:-/server/docker-volumes/CONTAINER_NAME/data/supervisor/logs}:/server/data/supervisor/logs
+      - ${VOLUMES_REDIS_DATE_PATH:-/server/docker-volumes/CONTAINER_NAME/data/redis}:/server/data/redis
+      - ${VOLUMES_CONFIG_PATH:-/server/docker-volumes/CONTAINER_NAME/config}:/server/config
+      - ${VOLUMES_CONFIG_SUPERVISOR_PATH:-/server/docker-volumes/CONTAINER_NAME/config/supervisor}:/etc/supervisor/conf.d
     networks:
       - home-club
     ports:

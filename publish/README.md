@@ -6,7 +6,7 @@ php bin/hyperf.php vendor:publish jiajushe/hyperf-helper
 
 创建数据卷目录
 
-mkdir -p /server/docker-volumes/swoole-mongodb-redis
+mkdir -p /server/docker-volumes/CONTAINER_NAME
 
 ***************************************************************************************
 
@@ -45,7 +45,7 @@ cp ./volumes/config/redis/redis.conf.default ./volumes/config/redis/redis.conf
 
 复制配置文件到宿主数据卷目录
 
-cp -r ./volumes/config /server/docker-volumes/swoole-mongodb-redis
+cp -r ./volumes/config /server/docker-volumes/CONTAINER_NAME
 
 ****************************************************************************
 
@@ -54,10 +54,6 @@ cp -r ./volumes/config /server/docker-volumes/swoole-mongodb-redis
 cp ./.env.example ./.env
 
 **********************************************************************
-
-创建镜像
-
-docker-compose build
 
 运行镜像
 
@@ -83,14 +79,14 @@ supervisorctl update
 
 开发运行
 
-docker run --name swoole-mongodb-redis -it --network home-club \
--v /server/docker-volumes/swoole-mongodb-redis/data/mongodb/databases:/server/data/mongodb/databases \
--v /server/docker-volumes/swoole-mongodb-redis/data/mongodb/logs:/server/data/mongodb/logs \
--v /server/docker-volumes/swoole-mongodb-redis/data/supervisor/logs:/server/data/supervisor/logs \
--v /server/docker-volumes/swoole-mongodb-redis/data/redis:/server/data/redis \
--v /server/docker-volumes/swoole-mongodb-redis/config:/server/config \
--v /server/docker-volumes/swoole-mongodb-redis/config/supervisor:/etc/supervisor/conf.d \
--v /home/smart/my_project/saas/server/swoole-mongodb-redis:/server/hyperf \
+docker run --name CONTAINER_NAME -it --network home-club \
+-v /server/docker-volumes/CONTAINER_NAME/data/mongodb/databases:/server/data/mongodb/databases \
+-v /server/docker-volumes/CONTAINER_NAME/data/mongodb/logs:/server/data/mongodb/logs \
+-v /server/docker-volumes/CONTAINER_NAME/data/supervisor/logs:/server/data/supervisor/logs \
+-v /server/docker-volumes/CONTAINER_NAME/data/redis:/server/data/redis \
+-v /server/docker-volumes/CONTAINER_NAME/config:/server/config \
+-v /server/docker-volumes/CONTAINER_NAME/config/supervisor:/etc/supervisor/conf.d \
+-v /home/smart/my_project/saas/server/CONTAINER_NAME:/server/hyperf \
 -p 27030:27017 \
 -p 6379:6379 \
 swoole-mongodb-redis \
