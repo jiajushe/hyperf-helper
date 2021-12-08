@@ -295,18 +295,32 @@ class ModelTask
                     }
                 }
                 if (in_array($index, $join_tables)) {
-                    foreach ($row->{$index} as $key => $join) {
-                        foreach ($join as $k => $r) {
+                    if (is_array($row->{$index})) {
+                        foreach ($row->{$index} as $key => $join) {
+                            foreach ($join as $k => $r) {
+                                if ($r instanceof ObjectId) {
+                                    if ($k == '_id') {
+                                        $row->{$index}[$key]->id = (string)$r;
+                                        unset($row->{$index}[$key]->_id);
+                                    } else {
+                                        $row->{$index}[$key]->{$k} = (string)$r;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        foreach ($row->{$index} as $k => $r) {
                             if ($r instanceof ObjectId) {
                                 if ($k == '_id') {
-                                    $row->{$index}[$key]->id = (string)$r;
-                                    unset($row->{$index}[$key]->_id);
+                                    $row->{$index}->id = (string)$r;
+                                    unset($row->{$index}->_id);
                                 } else {
-                                    $row->{$index}[$key]->{$k} = (string)$r;
+                                    $row->{$index}->{$k} = (string)$r;
                                 }
                             }
                         }
                     }
+
                 }
             }
         });
