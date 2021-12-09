@@ -80,7 +80,7 @@ class Common
             'secret' => $secret,
             'grant_type' => 'client_credential',
         ];
-        $res = self::request($weixin_type, $appid, $method,self::URI_ACCESS_TOKEN, $query);
+        $res = self::request($weixin_type, $appid, $method, self::URI_ACCESS_TOKEN, $query);
         $redis->set($redis_key, $res['access_token'], ($res['expires_in'] - 600));
         return $res['access_token'];
     }

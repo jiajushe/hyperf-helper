@@ -71,27 +71,27 @@ class Offiaccount
      * 发送模板消息.
      * @param array $data
      * [
-     *  "touser"=>"OPENID",(必须)
-     *  "template_id"=>"ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY",(必须)
-     *  "url":"http://weixin.qq.com/download",
-     *  "miniprogram"=>[
-     *      "appid"=>"xiaochengxuappid12345",(必须)
-     *      "pagepath"=>"index?foo=bar"
-     *  ],
+     * "touser"=>"OPENID",(必须)
+     * "template_id"=>"ngqIpbwh8bUfcSsECmogfXcV14J0tQlEpBO27izEYtY",(必须)
+     * "url"=>"http://weixin.qq.com/download",
+     * "miniprogram"=>[
+     * "appid"=>"xiaochengxuappid12345",(必须)
+     * "pagepath"=>"index?foo=bar"
+     * ],
      * "data"=>[(必须)
-     *      "first": [
-     *          "value"=>"恭喜你购买成功！",(必须)
-     *          "color"=>"#173177"
-     *      ],
-     *      "keyword1":[
-     *          "value"=>"巧克力",(必须)
-     *          "color"=>"#173177"
-     *      ],
-     *      "remark":[
-     *          "value"=>"欢迎再次购买！",(必须)
-     *          "color"=>"#173177"
-     *      ]
-     *   ]
+     * "first"=> [
+     * "value"=>"恭喜你购买成功！",(必须)
+     * "color"=>"#173177"
+     * ],
+     * "keyword1"=>[
+     * "value"=>"巧克力",(必须)
+     * "color"=>"#173177"
+     * ],
+     * "remark"=>[
+     * "value"=>"欢迎再次购买！",(必须)
+     * "color"=>"#173177"
+     * ]
+     * ]
      * ]
      * @return bool
      * @throws CustomError

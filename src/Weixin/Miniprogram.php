@@ -22,6 +22,7 @@ use Psr\Container\NotFoundExceptionInterface;
 class Miniprogram
 {
     public const URI_CODE_TO_SESSION = 'https://api.weixin.qq.com/sns/jscode2session';//code2Session
+    public const URI_SEND_SUBSCRIBE_MESSAGE = 'https://api.weixin.qq.com/cgi-bin/message/subscribe/send';//发订阅消息
 
     protected string $appid;
 
@@ -47,7 +48,7 @@ class Miniprogram
      * @return array
      * @throws CustomError
      */
-    public function decryptData(string $encrypted_data, string $iv, string $session_key):array
+    public function decryptData(string $encrypted_data, string $iv, string $session_key): array
     {
         $aesKey = base64_decode($session_key);
         if (strlen($iv) != 24) {
@@ -86,5 +87,35 @@ class Miniprogram
         return Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_CODE_TO_SESSION, $query);
     }
 
-
+    /**
+     * 发订阅消息
+     * @param array $data
+     * [
+     * 'touser' => 'oM5LW5d0Tf12or34QxrRbO7gQBjw',
+     * 'template_id' => 'scbDq9zNS5NXmSa3r7fVTIBn-8XVvX6O9TDBk4HxQpM',
+     * 'page' => '/pages/index/index',
+     * 'data' => [
+     * 'thing2' => [
+     * 'value' => '测试',
+     * ],
+     * 'thing3' => [
+     * 'value' => '18666380320',
+     * ],
+     * ],
+     * ]
+     * @return bool
+     * @throws CustomError
+     */
+    public function subscribeMessage(array $data)
+    {
+        $method = 'post';
+        $query = [
+            'access_token' => Common::getAccessToken($this->appid, $this->secret, self::WEIXIN_TYPE),
+        ];
+        $options = [
+            'json' => $data,
+        ];
+        Common::request(self::WEIXIN_TYPE, $this->appid, $method, self::URI_SEND_SUBSCRIBE_MESSAGE, $query, $options);
+        return true;
+    }
 }
