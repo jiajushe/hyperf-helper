@@ -80,7 +80,7 @@ class Common
             'secret' => $secret,
             'grant_type' => 'client_credential',
         ];
-        $res = self::request($weixin_type, $appid, $method,self::URI_ACCESS_TOKEN, $query);
+        $res = self::request($weixin_type, $appid, $method, self::URI_ACCESS_TOKEN, $query);
         $redis->set($redis_key, $res['access_token'], ($res['expires_in'] - 600));
         return $res['access_token'];
     }
@@ -103,7 +103,11 @@ class Common
         if (in_array($uri, self::ISSET_ERRCODE) && isset($res['errcode'])) {
             $error = true;
         } elseif ($res['errcode'] != 0) {
-            $error = true;
+            if ($uri == Miniprogram::URI_SEND_SUBSCRIBE_MESSAGE && $res['errcode'] == 43101) {
+                $error = false;
+            } else {
+                $error = true;
+            }
         }
         if ($error) {
             (new WeixinErrorLog())->log($weixin_type, $appid, $method, self::URI_ACCESS_TOKEN, $query, $res);
