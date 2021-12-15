@@ -26,12 +26,6 @@ class Common
 
     public const REDIS_PREFIX = 'WEIXIN:';
 
-    public const ISSET_ERRCODE = [
-        Offiaccount::URI_AUTH_ACCESS_TOKEN,
-        Offiaccount::URI_AUTH_USERINFO,
-        Miniprogram::URI_CODE_TO_SESSION,
-    ];
-
     /**
      * 获取Redis对象
      * @throws ContainerExceptionInterface
@@ -100,9 +94,7 @@ class Common
         $guzzleHelper = new GuzzleHelper();
         $res = $guzzleHelper->getResponse($guzzleHelper->request($method, $uri, $query, $options));
         $error = false;
-        if (in_array($uri, self::ISSET_ERRCODE) && isset($res['errcode'])) {
-            $error = true;
-        } elseif ($res['errcode'] != 0) {
+        if (isset($res['errcode']) && $res['errcode'] != 0) {
             if ($uri == Miniprogram::URI_SEND_SUBSCRIBE_MESSAGE && $res['errcode'] == 43101) {
                 $error = false;
             } else {
