@@ -115,7 +115,7 @@ class Miniprogram
         ];
         foreach ($data['data'] as $index => $datum) {
             if (Str::contains($index, 'thing')) {
-                $data['data'][$index] = Str::substr($datum, 0, 2);
+                $data['data'][$index]['value'] = Str::substr($datum['value'], 0, 20);
             }
         }
         $options = [
