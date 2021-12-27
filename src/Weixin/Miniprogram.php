@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Jiajushe\HyperfHelper\Weixin;
 
+use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
 use Jiajushe\HyperfHelper\Exception\CustomNormal;
 use Jiajushe\HyperfHelper\Helper\GuzzleHelper;
@@ -112,6 +113,11 @@ class Miniprogram
         $query = [
             'access_token' => Common::getAccessToken($this->appid, $this->secret, self::WEIXIN_TYPE),
         ];
+        foreach ($data['data'] as $index => $datum) {
+            if (Str::contains($index, 'thing')) {
+                $data['data'][$index] = Str::substr($datum, 0, 2);
+            }
+        }
         $options = [
             'json' => $data,
         ];
