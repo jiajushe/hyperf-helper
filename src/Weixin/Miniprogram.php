@@ -14,11 +14,6 @@ namespace Jiajushe\HyperfHelper\Weixin;
 
 use Hyperf\Utils\Str;
 use Jiajushe\HyperfHelper\Exception\CustomError;
-use Jiajushe\HyperfHelper\Exception\CustomNormal;
-use Jiajushe\HyperfHelper\Helper\GuzzleHelper;
-use Jiajushe\HyperfHelper\MongoDB\WeixinErrorLog;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 class Miniprogram
 {
